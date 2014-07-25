@@ -1,0 +1,14 @@
+{
+  "name": "pay-with-amazon",
+  "repo": "recurly/pay-with-amazon",
+  "description": "Easy Amazon Payments",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {},
+  "development": {},
+  "license": "MIT",
+  "main": "index.js",
+  "scripts": [
+    "index.js"
+  ]
+}
