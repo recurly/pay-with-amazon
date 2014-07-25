@@ -28,9 +28,8 @@ module.exports = payWithAmazon;
  * 
  *   - proper error handling
  *   - configurable widget sizing
- *   - use binding shim
- *   - provide default values
- *   - configurable widget dimensions
+ *   - config defaults
+ *   - use bind shim
  *
  * @param {Object} opts
  * @param {String} opts.sellerId
