@@ -1,0 +1,16 @@
+{
+  "name": "pay-with-amazon",
+  "description": "Easy Amazon Payments",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/recurly/pay-with-amazon.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "component": "0.19.x",
+    "uglify-js": "2.4.x"
+  }
+}
