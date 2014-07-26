@@ -1,11 +1,19 @@
+BIN = node_modules/.bin
+COMPONENT = $(BIN)/component
+MINIFY = $(BIN)/uglifyjs
 
-build: components index.js
-	@component build --dev
+pay-with-amazon.js: node_modules components $(SRC)
+	@$(COMPONENT) build --standalone payWithAmazon --name pay-with-amazon --out .
+	@$(MINIFY) pay-with-amazon.js --output pay-with-amazon.min.js
 
 components: component.json
-	@component install --dev
+	@$(COMPONENT) install
+
+node_modules: package.json
+	@npm install --silent
 
 clean:
-	rm -fr build components template.js
+	@rm -rf node_modules pay-with-amazon.js pay-with-amazon.min.js
 
+.PHONY: pay-with-amazon.js
 .PHONY: clean

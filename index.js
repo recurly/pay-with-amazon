@@ -27,6 +27,7 @@ module.exports = payWithAmazon;
  * TODO
  * 
  *   - proper error handling
+ *   - add events
  *   - configurable widget sizing
  *   - config defaults
  *   - use bind shim
