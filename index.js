@@ -2,7 +2,7 @@
  * exports
  */
 
-module.exports = payWithAmazon;
+module.exports = PayWithAmazon;
 
 /**
  * Off Amazon Payments wrapper
@@ -13,7 +13,7 @@ module.exports = payWithAmazon;
  *
  * example
  *
- *   payWithAmazon({
+ *   new PayWithAmazon({
  *     sellerId: 'abc',
  *     clientId: 'xyz',
  *     targets: {
@@ -42,8 +42,8 @@ module.exports = payWithAmazon;
  * @param {String} opts.targets.consent
  */
 
-function payWithAmazon (opts) {
-  if (!(this instanceof payWithAmazon)) return new payWithAmazon(opts);
+function PayWithAmazon (opts) {
+  if (!(this instanceof PayWithAmazon)) return new PayWithAmazon(opts);
 
   this.configure(opts);
 
@@ -60,7 +60,7 @@ function payWithAmazon (opts) {
   window.onAmazonLoginReady = this.init.bind(this);
 }
 
-payWithAmazon.prototype.configure = function (opts) {
+PayWithAmazon.prototype.configure = function (opts) {
   if (!(typeof opts === 'object')) throw new Error ('opts must be provided as an object.');
   if (!opts.sellerId) throw new Error('opts.sellerId required.');
   if (!opts.clientId) throw new Error('opts.clientId required.');
@@ -80,11 +80,11 @@ payWithAmazon.prototype.configure = function (opts) {
   this.config = opts;
 };
 
-payWithAmazon.prototype.error = function (err) {
+PayWithAmazon.prototype.error = function (err) {
   console.error(err, err.getErrorCode(), err.getErrorMessage());
 };
 
-payWithAmazon.prototype.init = function () {
+PayWithAmazon.prototype.init = function () {
   window.amazon.Login.setClientId(this.config.clientId);
 
   var self = this;
@@ -97,7 +97,7 @@ payWithAmazon.prototype.init = function () {
   }
 };
 
-payWithAmazon.prototype.initLogin = function () {
+PayWithAmazon.prototype.initLogin = function () {
   var self = this;
 
   this.widgets.button = new OffAmazonPayments.Button(this.config.targets.button, this.config.sellerId, {
@@ -117,7 +117,7 @@ payWithAmazon.prototype.initLogin = function () {
   });
 };
 
-payWithAmazon.prototype.initAddressBook = function () {
+PayWithAmazon.prototype.initAddressBook = function () {
   this.widgets.addressBook = new OffAmazonPayments.Widgets.AddressBook({
     agreementType: 'BillingAgreement',
     sellerId: this.config.sellerId,
@@ -128,7 +128,7 @@ payWithAmazon.prototype.initAddressBook = function () {
   }).bind(this.config.targets.addressBook);
 };
 
-payWithAmazon.prototype.initWallet = function (ref) {
+PayWithAmazon.prototype.initWallet = function (ref) {
   this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet({
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -138,7 +138,7 @@ payWithAmazon.prototype.initWallet = function (ref) {
   }).bind(this.config.targets.wallet);
 };
 
-payWithAmazon.prototype.initConsent = function (ref) {
+PayWithAmazon.prototype.initConsent = function (ref) {
   this.widgets.consent = new OffAmazonPayments.Widgets.Consent({
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -149,10 +149,10 @@ payWithAmazon.prototype.initConsent = function (ref) {
   }).bind(this.config.targets.consent);
 };
 
-payWithAmazon.prototype.setBillingAgreementId = function (ref) {
+PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
 };
 
-payWithAmazon.prototype.setConsentStatus = function (amazonConsentStatus) {
+PayWithAmazon.prototype.setConsentStatus = function (amazonConsentStatus) {
   this.consentStatus = amazonConsentStatus.getConsentStatus();
 };
