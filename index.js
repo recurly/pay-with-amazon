@@ -1,5 +1,12 @@
 /**
- * exports
+ * Dependencies
+ */
+
+var Emitter = require('emitter');
+var bind = require('bind');
+
+/**
+ * Exports
  */
 
 module.exports = PayWithAmazon;
@@ -27,7 +34,6 @@ module.exports = PayWithAmazon;
  * TODO
  * 
  *   - proper error handling
- *   - add events
  *   - configurable widget sizing
  *   - config defaults
  *   - use bind shim
@@ -51,14 +57,21 @@ function PayWithAmazon (opts) {
   this.consentStatus = false;
   this.widgets = {};
 
+  this.setBillingAgreementId = bind(this, this.setBillingAgreementId);
+  this.initWallet = bind(this, this.initWallet);
+  this.initConsent = bind(this, this.initConsent);
+  this.setConsentStatus = bind(this, this.setConsentStatus);
+
   document.write('<script src="'
     + 'https://static-na.payments-amazon.com/OffAmazonPayments'
     + '/us/sandbox/js/Widgets.js?sellerId='
     + this.config.sellerId
     + '"></script>');
 
-  window.onAmazonLoginReady = this.init.bind(this);
+  window.onAmazonLoginReady = bind(this, this.init);
 }
+
+Emitter(PayWithAmazon.prototype);
 
 PayWithAmazon.prototype.configure = function (opts) {
   if (!(typeof opts === 'object')) throw new Error ('opts must be provided as an object.');
@@ -121,8 +134,8 @@ PayWithAmazon.prototype.initAddressBook = function () {
   this.widgets.addressBook = new OffAmazonPayments.Widgets.AddressBook({
     agreementType: 'BillingAgreement',
     sellerId: this.config.sellerId,
-    onReady: this.setBillingAgreementId.bind(this),
-    onAddressSelect: this.initWallet.bind(this),
+    onReady: this.setBillingAgreementId,
+    onAddressSelect: this.initWallet,
     design: this.config.addressBookDimensions,
     onError: this.error
   }).bind(this.config.targets.addressBook);
@@ -133,7 +146,7 @@ PayWithAmazon.prototype.initWallet = function (ref) {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: this.config.walletDimensions,
-    onPaymentSelect: this.initConsent.bind(this),
+    onPaymentSelect: this.initConsent,
     onError: this.error
   }).bind(this.config.targets.wallet);
 };
@@ -143,8 +156,8 @@ PayWithAmazon.prototype.initConsent = function (ref) {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: this.config.consentDimensions,
-    onReady: this.setConsentStatus.bind(this),
-    onConsent: this.setConsentStatus.bind(this),
+    onReady: this.setConsentStatus,
+    onConsent: this.setConsentStatus,
     onError: this.error
   }).bind(this.config.targets.consent);
 };
