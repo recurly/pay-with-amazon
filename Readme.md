@@ -21,7 +21,8 @@ Emits an object describing the customer's status.
 
 ```js
 {
-  id: 'abc-xyz' // Amazon billing agreement id.
+  id: 'abc-xyz', // Amazon billing agreement id.
+  consent: true // Whether billing consent has been given
 }
 ```
 
@@ -29,7 +30,8 @@ And in case of an error:
 
 ```js
 {
-  error: 'Billing consent not given.', // A brief description of the error
+  consent: false, // May be true or false
+  error: 'Billing consent not given.' // A brief description of the error
 }
 ```
 

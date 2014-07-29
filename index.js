@@ -36,7 +36,6 @@ module.exports = PayWithAmazon;
  *   - proper error handling
  *   - configurable widget sizing
  *   - config defaults
- *   - use bind shim
  *
  * @param {Object} opts
  * @param {String} opts.sellerId
@@ -54,7 +53,7 @@ function PayWithAmazon (opts) {
   this.configure(opts);
 
   this.billingAgreementId = null;
-  this.consentStatus = false;
+  this.consent = undefined;
   this.widgets = {};
   this._status = this.status();
 
@@ -112,15 +111,26 @@ PayWithAmazon.prototype.init = function () {
 PayWithAmazon.prototype.status = function () {
   var id = this.billingAgreementId;
   var consent = this.consent;
+  var status = {};
   var error;
 
   if (!id) {
     error = 'Billing agreement ID has not been set.';
+  } else if (consent === undefined) {
+    error = 'Billing consent not yet given.';
   } else if (!consent) {
     error = 'Billing consent not given.';
   }
 
-  return error ? { error: error } : { id: id };
+  if (consent !== undefined) status.consent = consent;
+
+  if (error) {
+    status.error = error;
+  } else {
+    status.id = id;
+  }
+
+  return status;
 };
 
 /**
