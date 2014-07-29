@@ -69,6 +69,8 @@ function PayWithAmazon (opts) {
     + '"></script>');
 
   window.onAmazonLoginReady = bind(this, this.init);
+
+  return this;
 }
 
 Emitter(PayWithAmazon.prototype);
@@ -164,6 +166,7 @@ PayWithAmazon.prototype.initConsent = function (ref) {
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
+  this.emit('setBillingAgreementId', this.billingAgreementId);
 };
 
 PayWithAmazon.prototype.setConsentStatus = function (amazonConsentStatus) {
