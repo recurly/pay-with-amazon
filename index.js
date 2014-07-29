@@ -56,11 +56,12 @@ function PayWithAmazon (opts) {
   this.billingAgreementId = null;
   this.consentStatus = false;
   this.widgets = {};
+  this._status = this.status();
 
   this.setBillingAgreementId = bind(this, this.setBillingAgreementId);
   this.initWallet = bind(this, this.initWallet);
   this.initConsent = bind(this, this.initConsent);
-  this.setConsentStatus = bind(this, this.setConsentStatus);
+  this.setConsent = bind(this, this.setConsent);
 
   document.write('<script src="'
     + 'https://static-na.payments-amazon.com/OffAmazonPayments'
@@ -95,10 +96,6 @@ PayWithAmazon.prototype.configure = function (opts) {
   this.config = opts;
 };
 
-PayWithAmazon.prototype.error = function (err) {
-  console.error(err, err.getErrorCode(), err.getErrorMessage());
-};
-
 PayWithAmazon.prototype.init = function () {
   window.amazon.Login.setClientId(this.config.clientId);
 
@@ -109,6 +106,32 @@ PayWithAmazon.prototype.init = function () {
     if (!window.OffAmazonPayments.Button) return;
     clearTimeout(pollId);
     self.initLogin();
+  }
+};
+
+PayWithAmazon.prototype.status = function () {
+  var id = this.billingAgreementId;
+  var consent = this.consent;
+  var error;
+
+  if (!id) {
+    error = 'Billing agreement ID has not been set.';
+  } else if (!consent) {
+    error = 'Billing consent not given.';
+  }
+
+  return error ? { error: error } : { id: id };
+};
+
+/**
+ * Emits the 'change' event if the customer status has changed
+ */
+
+PayWithAmazon.prototype.check = function () {
+  var status = this.status();
+  if (JSON.stringify(status) !== JSON.stringify(this._status)) {
+    this._status = status;
+    this.emit('change', status);
   }
 };
 
@@ -158,17 +181,22 @@ PayWithAmazon.prototype.initConsent = function (ref) {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: this.config.consentDimensions,
-    onReady: this.setConsentStatus,
-    onConsent: this.setConsentStatus,
+    onReady: this.setConsent,
+    onConsent: this.setConsent,
     onError: this.error
   }).bind(this.config.targets.consent);
 };
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
-  this.emit('setBillingAgreementId', this.billingAgreementId);
+  this.check();
 };
 
-PayWithAmazon.prototype.setConsentStatus = function (amazonConsentStatus) {
-  this.consentStatus = amazonConsentStatus.getConsentStatus();
+PayWithAmazon.prototype.setConsent = function (consentStatus) {
+  this.consent = consentStatus.getConsentStatus() === 'true';
+  this.check();
+};
+
+PayWithAmazon.prototype.error = function (err) {
+  console.error(err, err.getErrorCode(), err.getErrorMessage());
 };

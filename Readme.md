@@ -11,7 +11,27 @@
 
 ## API
 
+### Events
 
+#### `change`
+
+Whenever the customer makes a change to their billing agreement.
+
+Emits an object describing the customer's status.
+
+```js
+{
+  id: 'abc-xyz' // Amazon billing agreement id.
+}
+```
+
+And in case of an error:
+
+```js
+{
+  error: 'Billing consent not given.', // A brief description of the error
+}
+```
 
 ## License
 
