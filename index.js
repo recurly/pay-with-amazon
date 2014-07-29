@@ -189,7 +189,6 @@ PayWithAmazon.prototype.initConsent = function (ref) {
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
-  this.check();
 };
 
 PayWithAmazon.prototype.setConsent = function (consentStatus) {
