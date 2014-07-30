@@ -89,7 +89,7 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
   opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
-  if (!opts.button.color) opts.button.color = 'gold';
+  if (!opts.button.color) opts.button.color = 'Gold';
 
   opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
   opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
