@@ -38,6 +38,8 @@ module.exports = PayWithAmazon;
  * @param {String} opts.clientId
  * @param {Object} opts.button
  * @param {String} opts.button.id
+ * @param {String} [opts.button.type] 'large' (default), 'small'
+ * @param {String} [opts.button.color] 'Gold' (default), 'LightGray', 'DarkGray'
  * @param {Object} [opts.addressBook]
  * @param {String} [opts.addressBook.id]
  * @param {Number} [opts.addressBook.width]
@@ -86,6 +88,9 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (!opts.sellerId) throw new Error('opts.sellerId required.');
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
+  opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+  if (!opts.button.color) opts.button.color = 'gold';
+
   opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
   opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
 
@@ -107,7 +112,7 @@ PayWithAmazon.prototype.init = function () {
   function poll () {
     if (!window.OffAmazonPayments.Button) return;
     clearTimeout(pollId);
-    self.initLogin();
+    self.initButton();
   }
 };
 
@@ -148,11 +153,14 @@ PayWithAmazon.prototype.check = function () {
   }
 };
 
-PayWithAmazon.prototype.initLogin = function () {
+PayWithAmazon.prototype.initButton = function () {
   var self = this;
+  var type = this.config.button.type;
+  var color = this.config.button.color;
 
   this.widgets.button = new OffAmazonPayments.Button(this.config.button, this.config.sellerId, {
-    type: 'PwA',
+    type: type,
+    color: color
     authorization: function () {
       var opts = {
         scope: 'profile payments:widget payments:shipping_address',
