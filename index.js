@@ -66,6 +66,7 @@ function PayWithAmazon (opts) {
   this.initWallet = bind(this, this.initWallet);
   this.initConsent = bind(this, this.initConsent);
   this.setConsent = bind(this, this.setConsent);
+  this.error = bind(this, this.error);
 
   document.write('<script src="'
     + 'https://static-na.payments-amazon.com/OffAmazonPayments'
@@ -209,5 +210,12 @@ PayWithAmazon.prototype.setConsent = function (consentStatus) {
 };
 
 PayWithAmazon.prototype.error = function (err) {
-  console.error(err, err.getErrorCode(), err.getErrorMessage());
+  var error = {
+    code: err.getErrorCode(),
+    message: err.getErrorMessage()
+  };
+
+  console && console.error(error);
+
+  this.emit('error', error);
 };
