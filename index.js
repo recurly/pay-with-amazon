@@ -23,28 +23,33 @@ module.exports = PayWithAmazon;
  *   new PayWithAmazon({
  *     sellerId: 'abc',
  *     clientId: 'xyz',
- *     targets: {
- *       button: 'pay-with-amazon',
- *       addressBook: 'address-book',
- *       wallet: 'wallet',
- *       consent: 'consent'
- *     }
+ *     button: { id: 'pay-with-amazon' },
+ *     addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
+ *     wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
+ *     consent: { id: 'consent' [, width: 400 [, height: 140]]}
  *   });
  *
  * TODO
  * 
  *   - proper error handling
- *   - configurable widget sizing
- *   - config defaults
  *
  * @param {Object} opts
  * @param {String} opts.sellerId
  * @param {String} opts.clientId
- * @param {Object} opts.targets
- * @param {String} opts.targets.button
- * @param {String} opts.targets.addressBook
- * @param {String} opts.targets.wallet
- * @param {String} opts.targets.consent
+ * @param {Object} opts.button
+ * @param {String} opts.button.id
+ * @param {Object} opts.addressBook
+ * @param {String} opts.addressBook.id
+ * @param {Number} opts.addressBook.width
+ * @param {Number} opts.addressBook.height
+ * @param {Object} opts.wallet
+ * @param {String} opts.wallet.id
+ * @param {Number} opts.wallet.width
+ * @param {Number} opts.wallet.height
+ * @param {Object} opts.consent
+ * @param {String} opts.consent.id
+ * @param {Number} opts.consent.width
+ * @param {Number} opts.consent.height
  */
 
 function PayWithAmazon (opts) {
@@ -80,17 +85,14 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (!opts.sellerId) throw new Error('opts.sellerId required.');
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
-  opts.addressBookDimensions = {
-    size: { width: '400px', height: '260px' }
-  };
+  opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
+  opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
 
-  opts.walletDimensions = {
-    size: { width: '400px', height: '260px' }
-  };
+  opts.wallet.width = (opts.wallet.width || 400) + 'px';
+  opts.wallet.height = (opts.wallet.height || 260) + 'px';
 
-  opts.consentDimensions = {
-    size : { width: '400px', height: '140px' }
-  };
+  opts.consent.width = (opts.consent.width || 400) + 'px';
+  opts.consent.height = (opts.consent.height || 140) + 'px';
 
   this.config = opts;
 };
@@ -148,7 +150,7 @@ PayWithAmazon.prototype.check = function () {
 PayWithAmazon.prototype.initLogin = function () {
   var self = this;
 
-  this.widgets.button = new OffAmazonPayments.Button(this.config.targets.button, this.config.sellerId, {
+  this.widgets.button = new OffAmazonPayments.Button(this.config.button, this.config.sellerId, {
     type: 'PwA',
     authorization: function () {
       var opts = {
@@ -171,30 +173,30 @@ PayWithAmazon.prototype.initAddressBook = function () {
     sellerId: this.config.sellerId,
     onReady: this.setBillingAgreementId,
     onAddressSelect: this.initWallet,
-    design: this.config.addressBookDimensions,
+    design: this.config.addressBook,
     onError: this.error
-  }).bind(this.config.targets.addressBook);
+  }).bind(this.config.addressBook.id);
 };
 
 PayWithAmazon.prototype.initWallet = function (ref) {
   this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet({
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: this.config.walletDimensions,
+    design: this.config.wallet,
     onPaymentSelect: this.initConsent,
     onError: this.error
-  }).bind(this.config.targets.wallet);
+  }).bind(this.config.wallet.id);
 };
 
 PayWithAmazon.prototype.initConsent = function (ref) {
   this.widgets.consent = new OffAmazonPayments.Widgets.Consent({
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: this.config.consentDimensions,
+    design: this.config.consent,
     onReady: this.setConsent,
     onConsent: this.setConsent,
     onError: this.error
-  }).bind(this.config.targets.consent);
+  }).bind(this.config.consent.id);
 };
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
