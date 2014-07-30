@@ -38,18 +38,18 @@ module.exports = PayWithAmazon;
  * @param {String} opts.clientId
  * @param {Object} opts.button
  * @param {String} opts.button.id
- * @param {Object} opts.addressBook
- * @param {String} opts.addressBook.id
- * @param {Number} opts.addressBook.width
- * @param {Number} opts.addressBook.height
+ * @param {Object} [opts.addressBook]
+ * @param {String} [opts.addressBook.id]
+ * @param {Number} [opts.addressBook.width]
+ * @param {Number} [opts.addressBook.height]
  * @param {Object} opts.wallet
  * @param {String} opts.wallet.id
- * @param {Number} opts.wallet.width
- * @param {Number} opts.wallet.height
+ * @param {Number} [opts.wallet.width]
+ * @param {Number} [opts.wallet.height]
  * @param {Object} opts.consent
  * @param {String} opts.consent.id
- * @param {Number} opts.consent.width
- * @param {Number} opts.consent.height
+ * @param {Number} [opts.consent.width]
+ * @param {Number} [opts.consent.height]
  */
 
 function PayWithAmazon (opts) {
@@ -169,35 +169,53 @@ PayWithAmazon.prototype.initLogin = function () {
 };
 
 PayWithAmazon.prototype.initAddressBook = function () {
-  this.widgets.addressBook = new OffAmazonPayments.Widgets.AddressBook({
-    agreementType: 'BillingAgreement',
-    sellerId: this.config.sellerId,
-    onReady: this.setBillingAgreementId,
-    onAddressSelect: this.initWallet,
-    design: this.config.addressBook,
-    onError: this.error
-  }).bind(this.config.addressBook.id);
+  if (this.config.addressBook) {
+    var opts = {
+      agreementType: 'BillingAgreement',
+      sellerId: this.config.sellerId,
+      onReady: this.setBillingAgreementId,
+      onAddressSelect: this.initWallet,
+      design: this.config.addressBook,
+      onError: this.error
+    };
+
+    this.widgets.addressBook = new OffAmazonPayments.Widgets.AddressBook(opts);
+    this.widgets.addressBook.bind(this.config.addressBook.id);
+  } else {
+    this.initWallet();
+  }
 };
 
 PayWithAmazon.prototype.initWallet = function (ref) {
-  this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet({
+  var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: this.config.wallet,
     onPaymentSelect: this.initConsent,
     onError: this.error
-  }).bind(this.config.wallet.id);
+  };
+
+  if (!this.billingAgreementId) {
+    opts.agreementType = 'BillingAgreement';
+    opts.onReady: this.setBillingAgreementId;
+  }
+
+  this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet(opts);
+  this.widgets.wallet.bind(this.config.wallet.id);
 };
 
 PayWithAmazon.prototype.initConsent = function (ref) {
-  this.widgets.consent = new OffAmazonPayments.Widgets.Consent({
+  var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: this.config.consent,
     onReady: this.setConsent,
     onConsent: this.setConsent,
     onError: this.error
-  }).bind(this.config.consent.id);
+  };
+
+  this.widgets.consent = new OffAmazonPayments.Widgets.Consent(opts);
+  this.widgets.consent.bind(this.config.consent.id);
 };
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
