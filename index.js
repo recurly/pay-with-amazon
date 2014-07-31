@@ -29,10 +29,6 @@ module.exports = PayWithAmazon;
  *     consent: { id: 'consent' [, width: 400 [, height: 140]]}
  *   });
  *
- * TODO
- * 
- *   - proper error handling
- *
  * @param {Object} opts
  * @param {String} opts.sellerId
  * @param {String} opts.clientId
@@ -273,6 +269,7 @@ PayWithAmazon.prototype.initConsent = function (ref) {
  */
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
+  console.log(ref)
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
 };
 

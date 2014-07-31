@@ -11,7 +11,7 @@
 
 ## API
 
-### PayWithAmazon(opts)
+### `PayWithAmazon(opts)`
 
 Initializes a new PayWthAmazon object.
 
@@ -32,19 +32,27 @@ Param | Type | Description
 ----- | ---- | -----------
 sellerId | String | Amazon Seller ID
 clientId | String | Amazon Client ID
+button | Object |
+button.id | String | DOM node id in which the Amazon login button will be placed
+[addressBook] | Object | If excluded, customers will interact solely with the wallet and consent widgets
+[addressBook.id] | String | DOM node id in which the Amazon address book widget will be placed
+[addressBook.width] | Number | Width of the widget in pixels
+[addressBook.height] | Number | Height of the widget in pixels
+wallet | Object | 
+wallet.id | String | DOM node id in which the Amazon wallet widget will be placed
+[wallet.width] | Number | Width of the widget in pixels
+[wallet.height] | Number | Height of the widget in pixels
+consent | Object | 
+consent.id | String | DOM node id in which the Amazon consent widget will be placed
+[consent.width] | Number | Width of the widget in pixels
+[consent.height] | Number | Height of the widget in pixels
 
-### .status
-
-Returns an object describing the current customer status. See 'change' event
-below for a description of the status object. Instead of calling this
-method directly, we recommend listening to the 'change' event.
-
-### .on (event, listener)
+### `.on(event, listener)`
 
 Attaches a listener to the specified event. See below for possible
 event names.
 
-### .off (event, listener)
+### `.off(event, listener)`
 
 Detaches a listener from the specified event.
 
