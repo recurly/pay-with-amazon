@@ -81,7 +81,20 @@ function PayWithAmazon (opts) {
   return this;
 }
 
+/**
+ * PayWithAmazon inherits Emitter
+ */
+
 Emitter(PayWithAmazon.prototype);
+
+/**
+ * Configures the instance based on passed `opts`
+ *
+ * Throws errors if the opts are insufficient to configure the instance,
+ * and sets defaults for those not specified.
+ *
+ * See initializer for description of `opts`
+ */
 
 PayWithAmazon.prototype.configure = function (opts) {
   if (!(typeof opts === 'object')) throw new Error ('opts must be provided as an object.');
@@ -103,6 +116,13 @@ PayWithAmazon.prototype.configure = function (opts) {
   this.config = opts;
 };
 
+/**
+ * Initialized the Amazon plugin
+ *
+ * Sets the client ID then waits for the widget classes to load
+ * before initializing the login button.
+ */
+
 PayWithAmazon.prototype.init = function () {
   window.amazon.Login.setClientId(this.config.clientId);
 
@@ -115,6 +135,12 @@ PayWithAmazon.prototype.init = function () {
     self.initButton();
   }
 };
+
+/**
+ * Returns an object describing the customer state
+ *
+ * @return {Object} customer state
+ */
 
 PayWithAmazon.prototype.status = function () {
   var id = this.billingAgreementId;
@@ -153,6 +179,10 @@ PayWithAmazon.prototype.check = function () {
   }
 };
 
+/**
+ * Initializes the login button
+ */
+
 PayWithAmazon.prototype.initButton = function () {
   var self = this;
   var type = this.config.button.type;
@@ -176,6 +206,10 @@ PayWithAmazon.prototype.initButton = function () {
   });
 };
 
+/**
+ * Initializes the Address Book widget
+ */
+
 PayWithAmazon.prototype.initAddressBook = function () {
   if (this.config.addressBook) {
     var opts = {
@@ -193,6 +227,10 @@ PayWithAmazon.prototype.initAddressBook = function () {
     this.initWallet();
   }
 };
+
+/**
+ * Initializes the wallet widget
+ */
 
 PayWithAmazon.prototype.initWallet = function (ref) {
   var opts = {
@@ -212,6 +250,10 @@ PayWithAmazon.prototype.initWallet = function (ref) {
   this.widgets.wallet.bind(this.config.wallet.id);
 };
 
+/**
+ * Initializes the consent widget
+ */
+
 PayWithAmazon.prototype.initConsent = function (ref) {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
@@ -226,14 +268,26 @@ PayWithAmazon.prototype.initConsent = function (ref) {
   this.widgets.consent.bind(this.config.consent.id);
 };
 
+/**
+ * Sets the billingAgreementId based on a widgit init reference
+ */
+
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
 };
+
+/**
+ * Sets consent state based on an Amazon ConsentStatus
+ */
 
 PayWithAmazon.prototype.setConsent = function (consentStatus) {
   this.consent = consentStatus.getConsentStatus() === 'true';
   this.check();
 };
+
+/**
+ * Handles errors, logging to console and emitting via the 'error' event
+ */
 
 PayWithAmazon.prototype.error = function (err) {
   var error = {

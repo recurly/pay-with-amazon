@@ -11,11 +11,50 @@
 
 ## API
 
+### PayWithAmazon(opts)
+
+Initializes a new PayWthAmazon object.
+
+```js
+new PayWithAmazon({
+  sellerId: 'abc',
+  clientId: 'xyz',
+  button: { id: 'pay-with-amazon' },
+  addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
+  wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
+  consent: { id: 'consent' [, width: 400 [, height: 140]]}
+});
+```
+
+All widget behavior is defined through the passed-in options.
+
+Param | Type | Description
+----- | ---- | -----------
+sellerId | String | Amazon Seller ID
+clientId | String | Amazon Client ID
+
+### .status
+
+Returns an object describing the current customer status. See 'change' event
+below for a description of the status object. Instead of calling this
+method directly, we recommend listening to the 'change' event.
+
+### .on (event, listener)
+
+Attaches a listener to the specified event. See below for possible
+event names.
+
+### .off (event, listener)
+
+Detaches a listener from the specified event.
+
 ### Events
 
-Any PayWithAmazon instance will emit events during setup and customer interaction with the Amazon widgets.
+A PayWithAmazon instance may emit events during setup and customer
+interaction with the Amazon widgets.
 
-Listeners can be attached with the `on` method, and detached with the `off` method.
+Listeners can be attached with the `on` method, and detached with
+the `off` method.
 
 #### `change`
 
