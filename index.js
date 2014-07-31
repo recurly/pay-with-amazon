@@ -65,14 +65,19 @@ function PayWithAmazon (opts) {
   this.initConsent = bind(this, this.initConsent);
   this.setConsent = bind(this, this.setConsent);
   this.error = bind(this, this.error);
+  this.init = bind(this, this.init);
 
-  document.write('<script src="'
-    + 'https://static-na.payments-amazon.com/OffAmazonPayments'
-    + '/us/sandbox/js/Widgets.js?sellerId='
-    + this.config.sellerId
-    + '"></script>');
+  if ('OffAmazonPayments' in window) {
+    this.init();
+  } else {
+    document.write('<script src="'
+      + 'https://static-na.payments-amazon.com/OffAmazonPayments'
+      + '/us/sandbox/js/Widgets.js?sellerId='
+      + this.config.sellerId
+      + '"></script>');
 
-  window.onAmazonLoginReady = bind(this, this.init);
+    window.onAmazonLoginReady = this.init;
+  }
 
   return this;
 }
