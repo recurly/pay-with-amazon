@@ -3,20 +3,20 @@
 
   Easy Amazon Payments
 
-## Installation
+## Usage
 
-  Install with [component(1)](http://component.io):
+Simply include the `pay-with-amazon.min.js`.
 
-    $ component install recurly/pay-with-amazon
+**Important!** This **must** be included in the `<head>` of your document. [[1][#1]]
 
-## API
+```html
+<script src="pay-with-amazon.min.js"></script>
+```
 
-### `PayWithAmazon(opts)`
-
-Initializes a new PayWthAmazon object.
+Then, also in the document `<head>`, invoke `PayWithAmazon`.
 
 ```js
-new PayWithAmazon({
+var payWithAmazon = new PayWithAmazon({
   sellerId: 'abc',
   clientId: 'xyz',
   button: { id: 'pay-with-amazon' },
@@ -26,6 +26,12 @@ new PayWithAmazon({
 });
 ```
 
+## API
+
+### `PayWithAmazon(opts)`
+
+Initializes a new PayWthAmazon object.
+
 All widget behavior is defined through the passed-in options.
 
 Param | Type | Description
@@ -34,6 +40,8 @@ sellerId | String | Amazon Seller ID
 clientId | String | Amazon Client ID
 button | Object |
 button.id | String | DOM node id in which the Amazon login button will be placed
+ * @param {String} [opts.button.type] 'large' (default), 'small'
+ * @param {String} [opts.button.color] 'Gold' (default), 'LightGray', 'DarkGray'
 [addressBook] | Object | If excluded, customers will interact solely with the wallet and consent widgets
 [addressBook.id] | String | DOM node id in which the Amazon address book widget will be placed
 [addressBook.width] | Number | Width of the widget in pixels
@@ -124,5 +132,11 @@ Emits and object describing the error.
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
+
+## Notes
+
+##### 1
+Amazon builds its widgets using methods that will otherwise fail if they are not invoked
+from the document `<head>`.
 
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
