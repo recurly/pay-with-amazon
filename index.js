@@ -147,21 +147,20 @@ PayWithAmazon.prototype.status = function () {
   var id = this.billingAgreementId;
   var consent = this.consent;
   var status = {};
-  var error;
 
-  if (!id) {
-    error = 'Billing agreement ID has not been set.';
-  } else if (consent === undefined) {
-    error = 'Billing consent not yet given.';
-  } else if (!consent) {
-    error = 'Billing consent not given.';
+  if (consent !== undefined) {
+    status.consent = consent;
   }
 
-  if (consent !== undefined) status.consent = consent;
+  if (!id) {
+    status.error = 'Billing agreement ID has not been set.';
+  } else if (consent === undefined) {
+    status.error = 'Billing consent not yet given.';
+  } else if (!consent) {
+    status.error = 'Billing consent not given.';
+  }
 
-  if (error) {
-    status.error = error;
-  } else {
+  if (!status.error) {
     status.id = id;
   }
 
