@@ -615,7 +615,7 @@ PayWithAmazon.prototype.initAddressBook = function () {
       sellerId: this.config.sellerId,
       onReady: this.setBillingAgreementId,
       onAddressSelect: this.initWallet,
-      design: this.config.addressBook,
+      design: { size: this.config.addressBook },
       onError: this.error
     };
 
@@ -634,7 +634,7 @@ PayWithAmazon.prototype.initWallet = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: this.config.wallet,
+    design: { size: this.config.wallet },
     onPaymentSelect: this.initConsent,
     onError: this.error
   };
@@ -656,7 +656,7 @@ PayWithAmazon.prototype.initConsent = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: this.config.consent,
+    design: { size: this.config.consent },
     onReady: this.setConsent,
     onConsent: this.setConsent,
     onError: this.error
