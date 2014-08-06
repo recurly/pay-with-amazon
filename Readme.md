@@ -9,7 +9,7 @@
 
   Simply include the `pay-with-amazon.min.js`.
 
-  **Important!** This **must** be included in the `<head>` of your document. [[1][#1]]
+  **Important!** This **must** be included in the `<head>` of your document. [[1](#1)]
 
   ```html
   <script src="pay-with-amazon.min.js"></script>
@@ -30,43 +30,61 @@
 
 ## API
 
-### `PayWithAmazon(opts)`
+#### `PayWithAmazon(opts)`
 
   Initializes a new PayWthAmazon object.
-
-  All widget behavior is defined through the passed-in options.
 
   Param | Type | Description
   ----- | ---- | -----------
   sellerId | String | Amazon Seller ID
   clientId | String | Amazon Client ID
-  button | Object |
-  button.id | String | DOM node id in which the Amazon login button will be placed
-   * @param {String} [opts.button.type] 'large' (default), 'small'
-   * @param {String} [opts.button.color] 'Gold' (default), 'LightGray', 'DarkGray'
-  [addressBook] | Object | If excluded, customers will interact solely with the wallet and consent widgets
-  [addressBook.id] | String | DOM node id in which the Amazon address book widget will be placed
-  [addressBook.width] | Number | Width of the widget in pixels
-  [addressBook.height] | Number | Height of the widget in pixels
-  wallet | Object | 
-  wallet.id | String | DOM node id in which the Amazon wallet widget will be placed
-  [wallet.width] | Number | Width of the widget in pixels
-  [wallet.height] | Number | Height of the widget in pixels
-  consent | Object | 
-  consent.id | String | DOM node id in which the Amazon consent widget will be placed
-  [consent.width] | Number | Width of the widget in pixels
-  [consent.height] | Number | Height of the widget in pixels
+  button | Object | [button options](#button-options)
+  [addressBook] | Object | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets
+  wallet | Object | [wallet options](#wallet-options)
+  [consent] | Object | [conset options](#consent-options)
 
-### `.on(event, listener)`
+##### button options
+
+  Param | Type | Description
+  ----- | ---- | -----------
+  id | String | DOM node id in which the Amazon login button will be placed
+  [type] | String | 'large' (default), 'small' [See button guide][button-guide]
+  [color] | String | 'Gold' (default), 'LightGray', 'DarkGray' [See button guide][button-guide]
+
+##### addressBook options
+
+  Param | Type | Description
+  ----- | ---- | -----------
+  id | String | DOM node id in which the Amazon address book widget will be placed
+  [width] | Number | Width of the widget in pixels
+  [height] | Number | Height of the widget in pixels
+
+##### wallet options
+
+  Param | Type | Description
+  ----- | ---- | -----------
+  id | String | DOM node id in which the Amazon wallet widget will be placed
+  [width] | Number | Width of the widget in pixels
+  [height] | Number | Height of the widget in pixels
+
+##### consent options
+
+  Param | Type | Description
+  ----- | ---- | -----------
+  id | String | DOM node id in which the Amazon consent widget will be placed
+  [width] | Number | Width of the widget in pixels
+  [height] | Number | Height of the widget in pixels
+
+#### `#on(event, listener)`
 
   Attaches a listener to the specified event. See below for possible
   event names.
 
-### `.off(event, listener)`
+#### `#off(event, listener)`
 
   Detaches a listener from the specified event.
 
-### Events
+#### Events
 
   A PayWithAmazon instance may emit events during setup and customer
   interaction with the Amazon widgets.
@@ -74,7 +92,7 @@
   Listeners can be attached with the `on` method, and detached with
   the `off` method.
 
-#### `change`
+##### `change`
 
   Whenever the customer makes a change to their billing agreement.
 
@@ -96,7 +114,7 @@
   }
   ```
 
-#### `error`
+##### `error`
 
   Whenever an error occurs setting up the widgets or while the customer is interacting with the Amazon widgets.
 
@@ -143,3 +161,4 @@ from the document `<head>`.
 
 [demo]: https://recurly.github.io/pay-with-amazon/
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
+[button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
