@@ -30,9 +30,11 @@
 
 ## API
 
-#### `PayWithAmazon(opts)`
+### PayWithAmazon(opts)
+
 
   Initializes a new PayWthAmazon object.
+
 
   Param | Type | Description
   ----- | ---- | -----------
@@ -43,7 +45,7 @@
   wallet | Object | [wallet options](#wallet-options)
   [consent] | Object | [conset options](#consent-options)
 
-##### button options
+#### button options
 
   Param | Type | Description
   ----- | ---- | -----------
@@ -51,7 +53,7 @@
   [type] | String | 'large' (default), 'small' [See button guide][button-guide]
   [color] | String | 'Gold' (default), 'LightGray', 'DarkGray' [See button guide][button-guide]
 
-##### addressBook options
+#### addressBook options
 
   Param | Type | Description
   ----- | ---- | -----------
@@ -59,7 +61,7 @@
   [width] | Number | Width of the widget in pixels
   [height] | Number | Height of the widget in pixels
 
-##### wallet options
+#### wallet options
 
   Param | Type | Description
   ----- | ---- | -----------
@@ -67,7 +69,7 @@
   [width] | Number | Width of the widget in pixels
   [height] | Number | Height of the widget in pixels
 
-##### consent options
+#### consent options
 
   Param | Type | Description
   ----- | ---- | -----------
@@ -75,16 +77,16 @@
   [width] | Number | Width of the widget in pixels
   [height] | Number | Height of the widget in pixels
 
-#### `#on(event, listener)`
+### #on(event, listener)
 
   Attaches a listener to the specified event. See below for possible
   event names.
 
-#### `#off(event, listener)`
+### #off(event, listener)
 
   Detaches a listener from the specified event.
 
-#### Events
+### Events
 
   A PayWithAmazon instance may emit events during setup and customer
   interaction with the Amazon widgets.
@@ -92,7 +94,7 @@
   Listeners can be attached with the `on` method, and detached with
   the `off` method.
 
-##### `change`
+#### change
 
   Whenever the customer makes a change to their billing agreement.
 
@@ -114,7 +116,7 @@
   }
   ```
 
-##### `error`
+#### error
 
   Whenever an error occurs setting up the widgets or while the customer is interacting with the Amazon widgets.
 
@@ -156,8 +158,8 @@
 ## Notes
 
 ##### 1
-Amazon builds its widgets using methods that will otherwise fail if they are not invoked
-from the document `<head>`.
+  Amazon builds its widgets using methods that will otherwise fail if
+  they are not invoked from the document `<head>`.
 
 [demo]: https://recurly.github.io/pay-with-amazon/
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
