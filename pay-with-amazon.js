@@ -586,7 +586,7 @@ PayWithAmazon.prototype.initButton = function () {
   var type = this.config.button.type;
   var color = this.config.button.color;
 
-  this.widgets.button = new OffAmazonPayments.Button(this.config.button, this.config.sellerId, {
+  this.widgets.button = new OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
     type: type,
     color: color,
     authorization: function () {
