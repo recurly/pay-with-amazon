@@ -1,3 +1,5 @@
+'use strict';
+
 /**
  * Dependencies
  */
@@ -98,7 +100,7 @@ Emitter(PayWithAmazon.prototype);
  */
 
 PayWithAmazon.prototype.configure = function (opts) {
-  if (!(typeof opts === 'object')) throw new Error ('opts must be provided as an object.');
+  if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
   if (!opts.sellerId) throw new Error('opts.sellerId required.');
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
@@ -190,7 +192,7 @@ PayWithAmazon.prototype.initButton = function () {
 
   this.widgets.button = new OffAmazonPayments.Button(this.config.button, this.config.sellerId, {
     type: type,
-    color: color
+    color: color,
     authorization: function () {
       var opts = {
         scope: 'profile payments:widget payments:shipping_address',
@@ -232,7 +234,7 @@ PayWithAmazon.prototype.initAddressBook = function () {
  * Initializes the wallet widget
  */
 
-PayWithAmazon.prototype.initWallet = function (ref) {
+PayWithAmazon.prototype.initWallet = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -243,7 +245,7 @@ PayWithAmazon.prototype.initWallet = function (ref) {
 
   if (!this.billingAgreementId) {
     opts.agreementType = 'BillingAgreement';
-    opts.onReady: this.setBillingAgreementId;
+    opts.onReady = this.setBillingAgreementId;
   }
 
   this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet(opts);
@@ -254,7 +256,7 @@ PayWithAmazon.prototype.initWallet = function (ref) {
  * Initializes the consent widget
  */
 
-PayWithAmazon.prototype.initConsent = function (ref) {
+PayWithAmazon.prototype.initConsent = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -273,7 +275,7 @@ PayWithAmazon.prototype.initConsent = function (ref) {
  */
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
-  console.log(ref)
+  console.log(ref);
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
 };
 
