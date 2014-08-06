@@ -7,6 +7,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Pay with Amazon example usage</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+      // Optional -- Enforces SSL on github pages
+      if (window.location.host === 'recurly.github.io' && window.location.protocol !== 'https:') {
+        window.location.protocol = 'https';
+      }
+    </script>
     <script src="pay-with-amazon.js"></script>
     <script>
       var payWithAmazon = new PayWithAmazon({
