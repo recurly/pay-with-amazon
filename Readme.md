@@ -141,5 +141,5 @@
 Amazon builds its widgets using methods that will otherwise fail if they are not invoked
 from the document `<head>`.
 
-[demo]: http://recurly.github.io/pay-with-amazon/
+[demo]: https://recurly.github.io/pay-with-amazon/
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
