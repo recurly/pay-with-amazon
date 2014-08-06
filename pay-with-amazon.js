@@ -394,6 +394,8 @@ module.exports = function(obj, fn){
 
 });
 require.register("pay-with-amazon/index.js", function(exports, require, module){
+'use strict';
+
 /**
  * Dependencies
  */
@@ -494,7 +496,7 @@ Emitter(PayWithAmazon.prototype);
  */
 
 PayWithAmazon.prototype.configure = function (opts) {
-  if (!(typeof opts === 'object')) throw new Error ('opts must be provided as an object.');
+  if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
   if (!opts.sellerId) throw new Error('opts.sellerId required.');
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
@@ -543,21 +545,20 @@ PayWithAmazon.prototype.status = function () {
   var id = this.billingAgreementId;
   var consent = this.consent;
   var status = {};
-  var error;
 
-  if (!id) {
-    error = 'Billing agreement ID has not been set.';
-  } else if (consent === undefined) {
-    error = 'Billing consent not yet given.';
-  } else if (!consent) {
-    error = 'Billing consent not given.';
+  if (consent !== undefined) {
+    status.consent = consent;
   }
 
-  if (consent !== undefined) status.consent = consent;
+  if (!id) {
+    status.error = 'Billing agreement ID has not been set.';
+  } else if (consent === undefined) {
+    status.error = 'Billing consent not yet given.';
+  } else if (!consent) {
+    status.error = 'Billing consent not given.';
+  }
 
-  if (error) {
-    status.error = error;
-  } else {
+  if (!status.error) {
     status.id = id;
   }
 
@@ -587,7 +588,7 @@ PayWithAmazon.prototype.initButton = function () {
 
   this.widgets.button = new OffAmazonPayments.Button(this.config.button, this.config.sellerId, {
     type: type,
-    color: color
+    color: color,
     authorization: function () {
       var opts = {
         scope: 'profile payments:widget payments:shipping_address',
@@ -629,7 +630,7 @@ PayWithAmazon.prototype.initAddressBook = function () {
  * Initializes the wallet widget
  */
 
-PayWithAmazon.prototype.initWallet = function (ref) {
+PayWithAmazon.prototype.initWallet = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -640,7 +641,7 @@ PayWithAmazon.prototype.initWallet = function (ref) {
 
   if (!this.billingAgreementId) {
     opts.agreementType = 'BillingAgreement';
-    opts.onReady: this.setBillingAgreementId;
+    opts.onReady = this.setBillingAgreementId;
   }
 
   this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet(opts);
@@ -651,7 +652,7 @@ PayWithAmazon.prototype.initWallet = function (ref) {
  * Initializes the consent widget
  */
 
-PayWithAmazon.prototype.initConsent = function (ref) {
+PayWithAmazon.prototype.initConsent = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -670,7 +671,7 @@ PayWithAmazon.prototype.initConsent = function (ref) {
  */
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
-  console.log(ref)
+  console.log(ref);
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
 };
 
