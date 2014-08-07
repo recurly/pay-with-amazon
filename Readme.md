@@ -41,9 +41,9 @@
   sellerId | String | Amazon Seller ID
   clientId | String | Amazon Client ID
   button | Object | [button options](#button-options)
-  [addressBook] | Object | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets
   wallet | Object | [wallet options](#wallet-options)
-  [consent] | Object | [conset options](#consent-options)
+  [addressBook] | Object | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets
+  [consent] | Object | [conset options](#consent-options). If excluded, customers may only be charged once
 
 #### button options
 
