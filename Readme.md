@@ -53,19 +53,19 @@
   [type] | String | 'large' (default), 'small' [See button guide][button-guide]
   [color] | String | 'Gold' (default), 'LightGray', 'DarkGray' [See button guide][button-guide]
 
-#### addressBook options
-
-  Param | Type | Description
-  ----- | ---- | -----------
-  id | String | DOM node id in which the Amazon address book widget will be placed
-  [width] | Number | Width of the widget in pixels
-  [height] | Number | Height of the widget in pixels
-
 #### wallet options
 
   Param | Type | Description
   ----- | ---- | -----------
   id | String | DOM node id in which the Amazon wallet widget will be placed
+  [width] | Number | Width of the widget in pixels
+  [height] | Number | Height of the widget in pixels
+
+#### addressBook options
+
+  Param | Type | Description
+  ----- | ---- | -----------
+  id | String | DOM node id in which the Amazon address book widget will be placed
   [width] | Number | Width of the widget in pixels
   [height] | Number | Height of the widget in pixels
 
