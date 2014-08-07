@@ -430,19 +430,19 @@ module.exports = PayWithAmazon;
  * @param {Object} opts
  * @param {String} opts.sellerId
  * @param {String} opts.clientId
- * @param {Object} opts.button
+ * @param {Object|String} opts.button if string, sets opts.button.id
  * @param {String} opts.button.id
  * @param {String} [opts.button.type] 'large' (default), 'small'
  * @param {String} [opts.button.color] 'Gold' (default), 'LightGray', 'DarkGray'
- * @param {Object} opts.wallet
+ * @param {Object|String} opts.wallet
  * @param {String} opts.wallet.id
  * @param {Number} [opts.wallet.width]
  * @param {Number} [opts.wallet.height]
- * @param {Object} [opts.addressBook]
+ * @param {Object|String} [opts.addressBook]
  * @param {String} opts.addressBook.id
  * @param {Number} [opts.addressBook.width]
  * @param {Number} [opts.addressBook.height]
- * @param {Object} [opts.consent]
+ * @param {Object|String} [opts.consent]
  * @param {String} opts.consent.id
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
@@ -500,20 +500,25 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (!opts.sellerId) throw new Error('opts.sellerId required.');
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
+  if (typeof opts.button === 'string') opts.button = { id: opts.button };
+  if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
+  if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
+  if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
+
   opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
   opts.button.color = opts.button.color || 'Gold';
 
   opts.wallet.width = (opts.wallet.width || 400) + 'px';
   opts.wallet.height = (opts.wallet.height || 260) + 'px';
 
-  if (opts.addressBook) {
-    opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
-    opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
-  }
-
   if (opts.consent) {
     opts.consent.width = (opts.consent.width || 400) + 'px';
     opts.consent.height = (opts.consent.height || 140) + 'px';
+  }
+
+  if (opts.addressBook) {
+    opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
+    opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
   }
 
   this.config = opts;
