@@ -131,6 +131,16 @@
 
   [See Amazon's documentation][error-codes] for a list of all possible error codes.
 
+## Compatibility
+
+IE8+, Firefox, Chrome, Safari
+
+## Notes
+
+##### 1
+  Amazon builds its widgets using methods that will otherwise fail if
+  they are not invoked from the document `<head>`.
+
 ## License
 
   The MIT License (MIT)
@@ -154,12 +164,6 @@
   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
-
-## Notes
-
-##### 1
-  Amazon builds its widgets using methods that will otherwise fail if
-  they are not invoked from the document `<head>`.
 
 [demo]: https://recurly.github.io/pay-with-amazon/
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81

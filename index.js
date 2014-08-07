@@ -69,7 +69,7 @@ function PayWithAmazon (opts) {
   this.error = bind(this, this.error);
   this.init = bind(this, this.init);
 
-  if ('OffAmazonPayments' in window) {
+  if ('window.OffAmazonPayments' in window) {
     this.init();
   } else {
     document.write('<script src="'
@@ -105,7 +105,7 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (!opts.clientId) throw new Error('opts.clientId required.');
 
   opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
-  if (!opts.button.color) opts.button.color = 'Gold';
+  opts.button.color = opts.button.color || 'Gold';
 
   opts.wallet.width = (opts.wallet.width || 400) + 'px';
   opts.wallet.height = (opts.wallet.height || 260) + 'px';
@@ -198,7 +198,7 @@ PayWithAmazon.prototype.initButton = function () {
   var type = this.config.button.type;
   var color = this.config.button.color;
 
-  this.widgets.button = new OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
+  this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
     type: type,
     color: color,
     authorization: function () {
@@ -207,7 +207,7 @@ PayWithAmazon.prototype.initButton = function () {
         popup: true
       };
 
-      amazon.Login.authorize(opts, function (res) {
+      window.amazon.Login.authorize(opts, function (res) {
         if (res.error) return self.error(res.error);
         if (self.config.addressBook) {
           self.initAddressBook();
@@ -234,7 +234,7 @@ PayWithAmazon.prototype.initAddressBook = function () {
     onError: this.error
   };
 
-  this.widgets.addressBook = new OffAmazonPayments.Widgets.AddressBook(opts);
+  this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
   this.widgets.addressBook.bind(this.config.addressBook.id);
 };
 
@@ -248,7 +248,7 @@ PayWithAmazon.prototype.initWallet = function () {
     sellerId: this.config.sellerId,
     design: { size: this.config.wallet },
     onPaymentSelect: function () {
-      if (this.consent) this.initConsent()
+      if (this.consent) this.initConsent();
     },
     onError: this.error
   };
@@ -258,7 +258,7 @@ PayWithAmazon.prototype.initWallet = function () {
     opts.onReady = this.setBillingAgreementId;
   }
 
-  this.widgets.wallet = new OffAmazonPayments.Widgets.Wallet(opts);
+  this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
   this.widgets.wallet.bind(this.config.wallet.id);
 };
 
@@ -276,7 +276,7 @@ PayWithAmazon.prototype.initConsent = function () {
     onError: this.error
   };
 
-  this.widgets.consent = new OffAmazonPayments.Widgets.Consent(opts);
+  this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
   this.widgets.consent.bind(this.config.consent.id);
 };
 
@@ -287,6 +287,7 @@ PayWithAmazon.prototype.initConsent = function () {
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
   console.log(ref);
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
+  this.check();
 };
 
 /**
