@@ -209,11 +209,7 @@ PayWithAmazon.prototype.initButton = function () {
 
       window.amazon.Login.authorize(opts, function (res) {
         if (res.error) return self.error(res.error);
-        if (self.config.addressBook) {
-          self.initAddressBook();
-        } else {
-          self.initWallet();
-        }
+        self.initAddressBook();
       });
     },
     onError: this.error
@@ -225,6 +221,8 @@ PayWithAmazon.prototype.initButton = function () {
  */
 
 PayWithAmazon.prototype.initAddressBook = function () {
+  if (!this.config.addressBook) return this.initWallet();
+
   var opts = {
     agreementType: 'BillingAgreement',
     sellerId: this.config.sellerId,
@@ -243,12 +241,14 @@ PayWithAmazon.prototype.initAddressBook = function () {
  */
 
 PayWithAmazon.prototype.initWallet = function () {
+  var self = this;
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: { size: this.config.wallet },
     onPaymentSelect: function () {
-      if (this.consent) this.initConsent();
+      self.initConsent();
+      self.check();
     },
     onError: this.error
   };
@@ -267,6 +267,9 @@ PayWithAmazon.prototype.initWallet = function () {
  */
 
 PayWithAmazon.prototype.initConsent = function () {
+  if (!this.config.consent) return;
+  if (this.widgets.consent) return;
+
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
@@ -285,7 +288,6 @@ PayWithAmazon.prototype.initConsent = function () {
  */
 
 PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
-  console.log(ref);
   this.billingAgreementId = ref.getAmazonBillingAgreementId();
   this.check();
 };
@@ -309,7 +311,12 @@ PayWithAmazon.prototype.error = function (err) {
     message: err.getErrorMessage()
   };
 
-  console && console.error(error);
+  if (console) {
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(error, this.error);
+    }
+    console.error(error);
+  }
 
   this.emit('error', error);
 };
