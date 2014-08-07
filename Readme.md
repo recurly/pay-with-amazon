@@ -40,10 +40,10 @@
   ----- | ---- | -----------
   sellerId | String | Amazon Seller ID
   clientId | String | Amazon Client ID
-  button | Object | [button options](#button-options)
-  wallet | Object | [wallet options](#wallet-options)
-  [addressBook] | Object | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets
-  [consent] | Object | [conset options](#consent-options). If excluded, customers may only be charged once
+  button | Object or String | [button options](#button-options). If String, sets button.id
+  wallet | Object or String | [wallet options](#wallet-options). If String, sets wallet.id
+  [addressBook] | Object or String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id.
+  [consent] | Object or String | [conset options](#consent-options). If excluded, customers may only be charged once. If String, sets consent.id.
 
 #### button options
 
