@@ -15,13 +15,13 @@
     </script>
     <script src="pay-with-amazon.js"></script>
     <script>
-      // For recurring transactions, all widgets: wallet, address book, and consent
-      var payWithAmazon = new PayWithAmazon({
+      // For one-time transactions, we omit consent since
+      // that applies only to recurring transactions
+      var oneTime = new PayWithAmazon({
         clientId: 'amzn1.application-oa2-client.127b0a3e68334641a3e4e129f686d140',
         sellerId: 'A35095BGBGQR66',
         button: 'pay-with-amazon',
         wallet: 'wallet',
-        consent: 'consent',
         addressBook: 'address-book'
       }).on('change', notify);
 
@@ -31,19 +31,10 @@
     </script>
   </head>
   <body>
-    <h2>All widgets, for recurring transactions</h2>
+    <h2>Consent widget omitted, for one-time transactions</h2>
 
     <div id="pay-with-amazon"></div>
     <div id="address-book"></div>
     <div id="wallet"></div>
-    <div id="consent"></div>
-
-    <h3>Other examples</h2>
-
-    <ul>
-      <li><a href="recurring-no-address-book.html">Recurring transactions (no address book)</a></li>
-      <li><a href="one-time.html">One-time transactions</a></li>
-      <li><a href="one-time-no-address-book.html">One-time transactions (no address book)</a></li>
-    </ul>
   </body>
 </html>
