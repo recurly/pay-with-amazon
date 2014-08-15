@@ -302,6 +302,7 @@ PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
  */
 
 PayWithAmazon.prototype.setConsent = function (consentStatus) {
+  if (typeof consentStatus.getConsentStatus === 'undefined') return;
   this.consent = consentStatus.getConsentStatus() === 'true';
   this.check();
 };
