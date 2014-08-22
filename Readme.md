@@ -1,9 +1,12 @@
 
-# pay-with-amazon
+# Pay with Amazon
 
-  Easy Amazon Payments
+Recurly provides this JavaScript plug-in library making it easy to add Pay with Amazon into your flow. The interactions take place in in-line widgets that can be configured based on simple options. The only experience outside of your site is the initial Amazon login. After the customer logs in, they're directed back to your site to confirm the address and payment method in the Amazon widgets.
+
+With Pay with Amazon, hundreds of millions of Amazon customers can subscribe to your subscription plans and make purchases using their Amazon account. For more information on how use this library with your Recurly site, please visit the [docs site][docs] to get started.
 
   [Demo][demo]
+
 
 ## Usage
 
@@ -19,12 +22,12 @@
 
   ```js
   var payWithAmazon = new PayWithAmazon({
-    sellerId: 'abc',
-    clientId: 'xyz',
-    button: { id: 'pay-with-amazon' },
-    addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
-    wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
-    consent: { id: 'consent' [, width: 400 [, height: 140]]}
+    sellerId: 'ABC',
+    clientId: 'XYZ',
+    button: { id: 'pay-with-amazon', [type], [color] },
+    addressBook: { id: 'address-book', [width], [height] },
+    wallet: { id: 'wallet', [width], [height] },
+    consent: { id: 'consent', [width], [height] }
   });
   ```
 
@@ -131,6 +134,49 @@
 
   [See Amazon's documentation][error-codes] for a list of all possible error codes.
 
+## Use Case Examples
+
+### Case 1: Standard Subscription
+This is a basic example of the standard settings for the Amazon Payment widgets. This would display the Amazon address, payment and consent widgets.
+
+  ```js
+  var payWithAmazon = new PayWithAmazon({     
+    sellerId: 'ABC',     
+    clientId: 'XYZ',     
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
+    addressBook: { id: 'address-book', width: 400, height: 260 },     
+    wallet: { id: 'wallet', width: 400, height: 260 },     
+    consent: { id: 'consent', width: 400, height: 140 } 
+  }); 
+  ```
+
+### Case 2: No Address Widget
+You may want to streamline your checkout experience if you are selling only digital goods and do not require an account address. In this case, you can remove the Amazon address widget.
+
+  ```js
+  var payWithAmazon = new PayWithAmazon({     
+    sellerId: 'ABC',     
+    clientId: 'XYZ',     
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
+    wallet: { id: 'wallet', width: 400, height: 260 },     
+    consent: { id: 'consent', width: 400, height: 140 } 
+  }); 
+  ```
+
+### Case 3: One-time Transactions
+Amazon Payments can also be used for one-time transactions. In this case, you would not want to display the Amazon consent widget since no future purchases would be processed using the same Amazon billing agreement. Any attempts to process additional purchases using an Amazon billing agreement where consent for future purchases was not given would not be processed.
+
+  ```js
+  var payWithAmazon = new PayWithAmazon({     
+    sellerId: 'ABC',     
+    clientId: 'XYZ',     
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
+    addressBook: { id: 'address-book', width: 400, height: 260 },     
+    wallet: { id: 'wallet', width: 400, height: 260 } 
+  }); 
+  ```
+
+
 ## Compatibility
 
 IE8+, Firefox, Chrome, Safari
@@ -168,3 +214,4 @@ IE8+, Firefox, Chrome, Safari
 [demo]: https://recurly.github.io/pay-with-amazon/
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
 [button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
+[docs]: https://docs.recurly.com/payment-gateways/amazon-payments
