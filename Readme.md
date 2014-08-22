@@ -1,5 +1,5 @@
 
-# Pay with Amazon by Amazon
+# Pay with Amazon
 
 Recurly provides this JavaScript plug-in library making it easy to add Pay with Amazon into your flow. The interactions take place in in-line widgets that can be configured based on simple options. The only experience outside of your site is the initial Amazon login. After the customer logs in, they're directed back to your site to confirm the address and payment method in the Amazon widgets.
 
@@ -22,12 +22,12 @@ With Pay with Amazon, hundreds of millions of Amazon customers can subscribe to 
 
   ```js
   var payWithAmazon = new PayWithAmazon({
-    sellerId: 'abc',
-    clientId: 'xyz',
-    button: { id: 'pay-with-amazon' },
-    addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
-    wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
-    consent: { id: 'consent' [, width: 400 [, height: 140]]}
+    sellerId: 'ABC',
+    clientId: 'XYZ',
+    button: { id: 'pay-with-amazon', [type], [color] },
+    addressBook: { id: 'address-book', [width], [height] },
+    wallet: { id: 'wallet', [width], [height] },
+    consent: { id: 'consent', [width], [height] }
   });
   ```
 
@@ -143,7 +143,7 @@ This is a basic example of the standard settings for the Amazon Payment widgets.
   var payWithAmazon = new PayWithAmazon({     
     sellerId: 'ABC',     
     clientId: 'XYZ',     
-    button: { id: 'pay-with-amazon', type: large, color: DarkGray },     
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
     addressBook: { id: 'address-book', width: 400, height: 260 },     
     wallet: { id: 'wallet', width: 400, height: 260 },     
     consent: { id: 'consent', width: 400, height: 140 } 
@@ -157,7 +157,7 @@ You may want to streamline your checkout experience if you are selling only digi
   var payWithAmazon = new PayWithAmazon({     
     sellerId: 'ABC',     
     clientId: 'XYZ',     
-    button: { id: 'pay-with-amazon', type: large, color: DarkGray },     
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
     wallet: { id: 'wallet', width: 400, height: 260 },     
     consent: { id: 'consent', width: 400, height: 140 } 
   }); 
@@ -170,7 +170,7 @@ Amazon Payments can also be used for one-time transactions. In this case, you wo
   var payWithAmazon = new PayWithAmazon({     
     sellerId: 'ABC',     
     clientId: 'XYZ',     
-    button: { id: 'pay-with-amazon', type: large, color: DarkGray },     
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
     addressBook: { id: 'address-book', width: 400, height: 260 },     
     wallet: { id: 'wallet', width: 400, height: 260 } 
   }); 
