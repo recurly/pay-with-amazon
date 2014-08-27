@@ -46,7 +46,7 @@ module.exports = PayWithAmazon;
  * @param {String} opts.addressBook.id
  * @param {Number} [opts.addressBook.width]
  * @param {Number} [opts.addressBook.height]
- * @param {Object|String} [opts.consent]
+ * @param {Object|String} opts.consent
  * @param {String} opts.consent.id
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
@@ -101,8 +101,12 @@ Emitter(PayWithAmazon.prototype);
 
 PayWithAmazon.prototype.configure = function (opts) {
   if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
-  if (!opts.sellerId) throw new Error('opts.sellerId required.');
-  if (!opts.clientId) throw new Error('opts.clientId required.');
+
+  if (!opts.sellerId) throw new Error('opts.sellerId is required.');
+  if (!opts.clientId) throw new Error('opts.clientId is required.');
+  if (!opts.button) throw new Error('opts.button is required.');
+  if (!opts.wallet) throw new Error('opts.wallet is required.');
+  if (!opts.consent) throw new Error('opts.consent is required.');
 
   if (typeof opts.button === 'string') opts.button = { id: opts.button };
   if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
@@ -115,10 +119,8 @@ PayWithAmazon.prototype.configure = function (opts) {
   opts.wallet.width = (opts.wallet.width || 400) + 'px';
   opts.wallet.height = (opts.wallet.height || 260) + 'px';
 
-  if (opts.consent) {
-    opts.consent.width = (opts.consent.width || 400) + 'px';
-    opts.consent.height = (opts.consent.height || 140) + 'px';
-  }
+  opts.consent.width = (opts.consent.width || 400) + 'px';
+  opts.consent.height = (opts.consent.height || 140) + 'px';
 
   if (opts.addressBook) {
     opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
@@ -163,16 +165,14 @@ PayWithAmazon.prototype.status = function () {
     status.error = 'Billing agreement ID has not been set.';
   }
 
-  if (this.config.consent) {
-    if (consent !== undefined) {
-      status.consent = consent;
-    }
+  if (consent !== undefined) {
+    status.consent = consent;
+  }
 
-    if (consent === undefined) {
-      status.error = 'Billing consent not yet given.';
-    } else if (!consent) {
-      status.error = 'Billing consent not given.';
-    }
+  if (consent === undefined) {
+    status.error = 'Billing consent not yet given.';
+  } else if (!consent) {
+    status.error = 'Billing consent not given.';
   }
 
   if (!status.error) {
@@ -272,9 +272,6 @@ PayWithAmazon.prototype.initWallet = function () {
  */
 
 PayWithAmazon.prototype.initConsent = function () {
-  if (!this.config.consent) return;
-  if (this.widgets.consent) return;
-
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,

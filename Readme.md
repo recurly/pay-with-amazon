@@ -1,21 +1,38 @@
 
 # Pay with Amazon
-
-Recurly provides this JavaScript plug-in library making it easy to add Pay with Amazon into your flow. The interactions take place in in-line widgets that can be configured based on simple options. The only experience outside of your site is the initial Amazon login. After the customer logs in, they're directed back to your site to confirm the address and payment method in the Amazon widgets.
-
-With Pay with Amazon, hundreds of millions of Amazon customers can subscribe to your subscription plans and make purchases using their Amazon account. For more information on how use this library with your Recurly site, please visit the [docs site][docs] to get started.
+  
+  Simple subscription billing with Amazon!
 
   [Demo][demo]
 
+## How?
+
+  This JavaScript library makes it easy to add Pay with Amazon to your payments
+  flow. Customers use in-line widgets you configure with simple options. The
+  only experience outside of your site is the initial Amazon login. After the
+  customer logs in, they're directed back to your site to confirm the address
+  and payment method in the Amazon widgets.
+
+## Why?
+
+  Using Pay with Amazon, hundreds of millions of Amazon customers can subscribe
+  to your subscription plans and make purchases using their Amazon account. For
+  more information on how use this library with your Recurly site, please
+  visit the [docs site][docs] to get started.
 
 ## Usage
 
-  Simply include the `pay-with-amazon.min.js`.
+  Simply include the `pay-with-amazon.min.js` JS file in your document head.
 
-  **Important!** This **must** be included in the `<head>` of your document. [[1](#1)]
+  **Important!** This **must** be included in the `<head>` of your document.
+  [[1](#1)]
 
   ```html
-  <script src="pay-with-amazon.min.js"></script>
+  <head>
+    ...
+    <script src="pay-with-amazon.min.js"></script>
+    ...
+  </head>
   ```
 
   Then, also in the document `<head>`, invoke `PayWithAmazon`.
@@ -46,7 +63,7 @@ With Pay with Amazon, hundreds of millions of Amazon customers can subscribe to 
   button | Object or String | [button options](#button-options). If String, sets button.id
   wallet | Object or String | [wallet options](#wallet-options). If String, sets wallet.id
   [addressBook] | Object or String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id.
-  [consent] | Object or String | [conset options](#consent-options). If excluded, customers may only be charged once. If String, sets consent.id.
+  consent | Object or String | [conset options](#consent-options). If String, sets consent.id.
 
 #### button options
 
@@ -121,7 +138,8 @@ With Pay with Amazon, hundreds of millions of Amazon customers can subscribe to 
 
 #### error
 
-  Whenever an error occurs setting up the widgets or while the customer is interacting with the Amazon widgets.
+  Whenever an error occurs setting up the widgets or while the customer is
+  interacting with the Amazon widgets.
 
   Emits and object describing the error.
 
@@ -137,7 +155,9 @@ With Pay with Amazon, hundreds of millions of Amazon customers can subscribe to 
 ## Use Case Examples
 
 ### Case 1: Standard Subscription
-This is a basic example of the standard settings for the Amazon Payment widgets. This would display the Amazon address, payment and consent widgets.
+
+  This is a basic example of the standard settings for the Amazon Payment
+  widgets. This would display the Amazon address, payment and consent widgets.
 
   ```js
   var payWithAmazon = new PayWithAmazon({     
@@ -151,7 +171,10 @@ This is a basic example of the standard settings for the Amazon Payment widgets.
   ```
 
 ### Case 2: No Address Widget
-You may want to streamline your checkout experience if you are selling only digital goods and do not require an account address. In this case, you can remove the Amazon address widget.
+
+  You may want to streamline your checkout experience if you are selling only
+  digital goods and do not require an account address. In this case, you can
+  remove the Amazon address widget.
 
   ```js
   var payWithAmazon = new PayWithAmazon({     
@@ -163,23 +186,10 @@ You may want to streamline your checkout experience if you are selling only digi
   }); 
   ```
 
-### Case 3: One-time Transactions
-Amazon Payments can also be used for one-time transactions. In this case, you would not want to display the Amazon consent widget since no future purchases would be processed using the same Amazon billing agreement. Any attempts to process additional purchases using an Amazon billing agreement where consent for future purchases was not given would not be processed.
-
-  ```js
-  var payWithAmazon = new PayWithAmazon({     
-    sellerId: 'ABC',     
-    clientId: 'XYZ',     
-    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
-    addressBook: { id: 'address-book', width: 400, height: 260 },     
-    wallet: { id: 'wallet', width: 400, height: 260 } 
-  }); 
-  ```
-
 
 ## Compatibility
 
-IE8+, Firefox, Chrome, Safari
+  IE8+, Firefox, Chrome, Safari
 
 ## Notes
 
