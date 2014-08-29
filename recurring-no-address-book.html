@@ -24,8 +24,12 @@
         consent: 'consent'
       }).on('change', notify);
 
-      function notify () {
+      function notify (status) {
         console && console.log.apply(console, arguments);
+
+        if (status.id) {
+          document.querySelector('#output').innerHTML = status.id;
+        }
       }
     </script>
   </head>
@@ -36,5 +40,11 @@
     <div id="address-book"></div>
     <div id="wallet"></div>
     <div id="consent"></div>
+
+    <h3>Output (Amazon Billing Agreement ID)</h3>
+
+    <div id="output">
+      Pending
+    </div>
   </body>
 </html>
