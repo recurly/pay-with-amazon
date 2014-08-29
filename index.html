@@ -25,8 +25,12 @@
         addressBook: 'address-book'
       }).on('change', notify);
 
-      function notify () {
+      function notify (status) {
         console && console.log.apply(console, arguments);
+
+        if (status.id) {
+          document.querySelector('#output').innerHTML = status.id;
+        }
       }
     </script>
   </head>
@@ -37,6 +41,8 @@
     <div id="address-book"></div>
     <div id="wallet"></div>
     <div id="consent"></div>
+
+    <div id="output"></div>
 
     <h3>Other examples</h2>
 
