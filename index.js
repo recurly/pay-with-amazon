@@ -91,6 +91,12 @@ function PayWithAmazon (opts) {
 Emitter(PayWithAmazon.prototype);
 
 /**
+ * Version
+ */
+
+PayWithAmazon.prototype.version = '1.0.0';
+
+/**
  * Configures the instance based on passed `opts`
  *
  * Throws errors if the opts are insufficient to configure the instance,
