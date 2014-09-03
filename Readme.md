@@ -5,6 +5,8 @@
 
   [Demo][demo]
 
+  [Download][download]
+
 ## How?
 
   This JavaScript library makes it easy to add Pay with Amazon to your payments
@@ -222,6 +224,7 @@
   THE SOFTWARE.
 
 [demo]: https://recurly.github.io/pay-with-amazon/
+[download]: https://github.com/recurly/pay-with-amazon/releases
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
 [button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
 [docs]: https://docs.recurly.com/payment-gateways/amazon-payments
