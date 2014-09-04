@@ -7,20 +7,18 @@
 
   [Download][download]
 
-## How?
+## Introduction
 
   This JavaScript library makes it easy to add Pay with Amazon to your payments
-  flow. Customers use in-line widgets you configure with simple options. The
-  only experience outside of your site is the initial Amazon login. After the
-  customer logs in, they're directed back to your site to confirm the address
-  and payment method in the Amazon widgets.
+  flow. During checkout, customers log in to Amazon, then use inline widgets
+  to select from payment methods stored in their Amazon accounts.
 
-## Why?
+  Hundreds of millions of Amazon customers can subscribe
+  to your subscription plans and make purchases using their Amazon account.
 
-  Using Pay with Amazon, hundreds of millions of Amazon customers can subscribe
-  to your subscription plans and make purchases using their Amazon account. For
-  more information on how use this library with your Recurly site, please
-  visit the [docs site][docs] to get started.
+  This library is platform agnostic, and may be used in any checkout flow to
+  make Amazon Payments easier to implement. To learn how use this library with
+  your Recurly site, please visit the [docs site][docs] to get started.
 
 ## Usage
 
@@ -37,35 +35,75 @@
   </head>
   ```
 
-  Then, also in the document `<head>`, invoke `PayWithAmazon`.
+  Then, also in the document `<head>`, invoke `PayWithAmazon`. Each widget
+  property accepts a String corresponding to the `id` of an element on your
+  page. These elements are where the corresponding widget will be injected.
 
-  ```js
-  var payWithAmazon = new PayWithAmazon({
-    sellerId: 'ABC',
-    clientId: 'XYZ',
-    button: { id: 'pay-with-amazon', [type], [color] },
-    addressBook: { id: 'address-book', [width], [height] },
-    wallet: { id: 'wallet', [width], [height] },
-    consent: { id: 'consent', [width], [height] }
-  });
+  For example:
+
+  ```html
+  <head>
+    ...
+    <script>
+      var payWithAmazon = new PayWithAmazon({
+        sellerId: 'ABC',
+        clientId: 'XYZ',
+        button: 'pay-with-amazon',
+        addressBook: 'address-book',
+        wallet: 'wallet',
+        consent: 'consent'
+      });
+    </script>
+    ...
+  </head>
+  ```
+
+  Each widget option also accepts an object value to pass more options.
+
+  ```html
+  <head>
+    ...
+    <script>
+      var payWithAmazon = new PayWithAmazon({
+        sellerId: 'ABC',
+        clientId: 'XYZ',
+        button: { id: 'pay-with-amazon', [type], [color] },
+        addressBook: { id: 'address-book', [width], [height] },
+        wallet: { id: 'wallet', [width], [height] },
+        consent: { id: 'consent', [width], [height] }
+      });
+    </script>
+    ...
+  </head>
+  ```
+
+  For this example, the `<body>` would need to contain the following elements:
+
+  ```html
+  <body>
+    ...
+    <div id="pay-with-amazon"></div>
+    <div id="address-book"></div>
+    <div id="wallet"></div>
+    <div id="consent"></div>
+    ...
+  </body>
   ```
 
 ## API
 
 ### PayWithAmazon(opts)
 
-
   Initializes a new PayWthAmazon object.
-
 
   Param | Type | Description
   ----- | ---- | -----------
   sellerId | String | Amazon Seller ID
   clientId | String | Amazon Client ID
-  button | Object or String | [button options](#button-options). If String, sets button.id
-  wallet | Object or String | [wallet options](#wallet-options). If String, sets wallet.id
-  [addressBook] | Object or String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id.
-  consent | Object or String | [conset options](#consent-options). If String, sets consent.id.
+  button | Object/String | [button options](#button-options). If String, sets button.id
+  wallet | Object/String | [wallet options](#wallet-options). If String, sets wallet.id
+  [addressBook] | Object/String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id
+  consent | Object/String | [conset options](#consent-options). If String, sets consent.id
 
 #### button options
 
@@ -154,9 +192,9 @@
 
   [See Amazon's documentation][error-codes] for a list of all possible error codes.
 
-## Use Case Examples
+## Use Cases
 
-### Case 1: Standard Subscription
+### Case 1: Standard Subscriptions
 
   This is a basic example of the standard settings for the Amazon Payment
   widgets. This would display the Amazon address, payment and consent widgets.
