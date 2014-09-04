@@ -22,7 +22,7 @@
 
 ## Usage
 
-  Simply include the `pay-with-amazon.min.js` JS file in your document head.
+  Simply include `pay-with-amazon.min.js` in your document head.
 
   **Important!** This **must** be included in the `<head>` of your document.
   [[1](#1)]
@@ -60,21 +60,15 @@
 
   Each widget option also accepts an object value to pass more options.
 
-  ```html
-  <head>
-    ...
-    <script>
-      var payWithAmazon = new PayWithAmazon({
-        sellerId: 'ABC',
-        clientId: 'XYZ',
-        button: { id: 'pay-with-amazon', [type], [color] },
-        addressBook: { id: 'address-book', [width], [height] },
-        wallet: { id: 'wallet', [width], [height] },
-        consent: { id: 'consent', [width], [height] }
-      });
-    </script>
-    ...
-  </head>
+  ```js
+  var payWithAmazon = new PayWithAmazon({
+    sellerId: 'ABC',
+    clientId: 'XYZ',
+    button: { id: 'pay-with-amazon', [type], [color] },
+    addressBook: { id: 'address-book', [width], [height] },
+    wallet: { id: 'wallet', [width], [height] },
+    consent: { id: 'consent', [width], [height] }
+  });
   ```
 
   For this example, the `<body>` would need to contain the following elements:
