@@ -10,15 +10,16 @@
 ## Introduction
 
   This JavaScript library makes it easy to add Pay with Amazon to your payments
-  flow. During checkout, customers log in to Amazon, then use inline widgets
-  to select from payment methods stored in their Amazon accounts.
+  flow. It wraps Amazon's Login and Pay with Amazon JavaScript libraries to
+  simplify its integration. See [Amazon's introduction to this service][amazon-docs]
+  for more detail.
 
-  Hundreds of millions of Amazon customers can subscribe
-  to your subscription plans and make purchases using their Amazon account.
+  Hundreds of millions of Amazon customers can subscribe to your subscription
+  plans and make purchases using their Amazon account.
 
   This library is platform agnostic, and may be used in any checkout flow to
   make Amazon Payments easier to implement. To learn how use this library with
-  your Recurly site, please visit the [docs site][docs] to get started.
+  your Recurly site, please [Recurly's documentation][recurly-docs] to get started.
 
 ## Usage
 
@@ -228,8 +229,8 @@
 ## Notes
 
 ##### 1
-  Amazon builds its widgets using methods that will otherwise fail if
-  they are not invoked from the document `<head>`.
+  Amazon's' widgets use methods that will otherwise fail if they are not
+  invoked from the document `<head>`.
 
 ## License
 
@@ -259,4 +260,5 @@
 [download]: https://github.com/recurly/pay-with-amazon/releases
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
 [button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
-[docs]: https://docs.recurly.com/payment-gateways/amazon-payments
+[amazon-docs]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_Introduction.html
+[recurly-docs]: https://docs.recurly.com/payment-gateways/amazon-payments
