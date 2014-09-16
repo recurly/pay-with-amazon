@@ -233,12 +233,17 @@ PayWithAmazon.prototype.initButton = function () {
  */
 
 PayWithAmazon.prototype.initAddressBook = function () {
+  var self = this;
+
   if (!this.config.addressBook) return this.initWallet();
 
   var opts = {
     agreementType: 'BillingAgreement',
     sellerId: this.config.sellerId,
-    onReady: this.setBillingAgreementId,
+    onReady: function (ref) {
+      self.emit('ready.addressBook');
+      self.setBillingAgreementId(ref);
+    },
     onAddressSelect: this.initWallet,
     design: { size: this.config.addressBook },
     onError: this.error
@@ -258,6 +263,12 @@ PayWithAmazon.prototype.initWallet = function () {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: { size: this.config.wallet },
+    onReady: function (ref) {
+      self.emit('ready.wallet');
+      if (!self.billingAgreementId) {
+        self.setBillingAgreementId(ref);
+      }
+    },
     onPaymentSelect: function () {
       self.initConsent();
       self.check();
@@ -267,7 +278,6 @@ PayWithAmazon.prototype.initWallet = function () {
 
   if (!this.billingAgreementId) {
     opts.agreementType = 'BillingAgreement';
-    opts.onReady = this.setBillingAgreementId;
   }
 
   this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
@@ -279,11 +289,15 @@ PayWithAmazon.prototype.initWallet = function () {
  */
 
 PayWithAmazon.prototype.initConsent = function () {
+  var self = this;
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
     design: { size: this.config.consent },
-    onReady: this.setConsent,
+    onReady: function (consentStatus) {
+      self.emit('ready.consent');
+      self.setConsent(consentStatus);
+    },
     onConsent: this.setConsent,
     onError: this.error
   };

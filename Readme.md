@@ -153,7 +153,7 @@
 
   Whenever the customer makes a change to their billing agreement.
 
-  Emits an object describing the customer's status.
+  **Emits:** An object describing the customer's status.
 
   ```js
   {
@@ -176,14 +176,32 @@
   Whenever the customer logs in. This may be used to hide the login button, or
   perform other page transitions.
 
-  Emits nothing.
+  **Emits:** nothing.
+
+#### ready.addressBook
+
+  The address book widget has finished laoding and is now displayed on the page.
+
+  **Emits:** Nothing.
+
+#### ready.wallet
+
+  The wallet widget has finished laoding and is now displayed on the page.
+
+  **Emits:** Nothing.
+
+#### ready.consent
+
+  The consent widget has finished laoding and is now displayed on the page.
+
+  **Emits:** Nothing.
 
 #### error
 
   Whenever an error occurs setting up the widgets or while the customer is
   interacting with the Amazon widgets.
 
-  Emits and object describing the error.
+  **Emits:** and object describing the error.
 
   ```js
   {
