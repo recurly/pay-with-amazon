@@ -220,6 +220,7 @@ PayWithAmazon.prototype.initButton = function () {
 
       window.amazon.Login.authorize(opts, function (res) {
         if (res.error) return self.error(res.error);
+        self.emit('login');
         self.initAddressBook();
       });
     },

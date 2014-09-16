@@ -171,6 +171,13 @@
   }
   ```
 
+#### login
+
+  Whenever the customer logs in. This may be used to hide the login button, or
+  perform other page transitions.
+
+  Emits nothing.
+
 #### error
 
   Whenever an error occurs setting up the widgets or while the customer is
