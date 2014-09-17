@@ -1,13 +1,10 @@
 BIN = node_modules/.bin
-COMPONENT = $(BIN)/component
+DUO = $(BIN)/duo
 MINIFY = $(BIN)/uglifyjs
 
-pay-with-amazon.js: node_modules components $(SRC)
-	@$(COMPONENT) build --standalone PayWithAmazon --name pay-with-amazon --out .
+pay-with-amazon.js: node_modules
+	@$(DUO) --global PayWithAmazon --out . index.js > pay-with-amazon.js
 	@$(MINIFY) pay-with-amazon.js --output pay-with-amazon.min.js
-
-components: component.json
-	@$(COMPONENT) install
 
 node_modules: package.json
 	@npm install --silent

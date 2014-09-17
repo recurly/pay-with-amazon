@@ -10,7 +10,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "component": "0.19.x",
+    "duo": "0.x",
     "uglify-js": "2.4.x"
   }
 }
