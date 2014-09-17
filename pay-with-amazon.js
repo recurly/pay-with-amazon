@@ -1,206 +1,437 @@
-;(function(){
+(function outer(modules, cache, entries){
+
+  /**
+   * Global
+   */
+
+  var global = (function(){ return this; })();
+
+  /**
+   * Require `name`.
+   *
+   * @param {String} name
+   * @param {Boolean} jumped
+   * @api public
+   */
+
+  function require(name, jumped){
+    if (cache[name]) return cache[name].exports;
+    if (modules[name]) return call(name, require);
+    throw new Error('cannot find module "' + name + '"');
+  }
+
+  /**
+   * Call module `id` and cache it.
+   *
+   * @param {Number} id
+   * @param {Function} require
+   * @return {Function}
+   * @api private
+   */
+
+  function call(id, require){
+    var m = cache[id] = { exports: {} };
+    var mod = modules[id];
+    var name = mod[2];
+    var fn = mod[0];
+
+    fn.call(m.exports, function(req){
+      var dep = modules[id][1][req];
+      return require(dep ? dep : req);
+    }, m, m.exports, outer, modules, cache, entries);
+
+    // expose as `name`.
+    if (name) cache[name] = cache[id];
+
+    return cache[id].exports;
+  }
+
+  /**
+   * Require all entries exposing them on global if needed.
+   */
+
+  for (var id in entries) {
+    if (entries[id]) {
+      global[entries[id]] = require(id);
+    } else {
+      require(id);
+    }
+  }
+
+  /**
+   * Duo flag.
+   */
+
+  require.duo = true;
+
+  /**
+   * Expose cache.
+   */
+
+  require.cache = cache;
+
+  /**
+   * Expose modules
+   */
+
+  require.modules = modules;
+
+  /**
+   * Return newest require.
+   */
+
+   return require;
+})({
+1: [function(require, module, exports) {
+'use strict';
 
 /**
- * Require the given path.
- *
- * @param {String} path
- * @return {Object} exports
- * @api public
+ * Dependencies
  */
 
-function require(path, parent, orig) {
-  var resolved = require.resolve(path);
+var Emitter = require('component/emitter');
+var bind = require('component/bind');
 
-  // lookup failed
-  if (null == resolved) {
-    orig = orig || path;
-    parent = parent || 'root';
-    var err = new Error('Failed to require "' + orig + '" from "' + parent + '"');
-    err.path = orig;
-    err.parent = parent;
-    err.require = true;
-    throw err;
+/**
+ * Exports
+ */
+
+module.exports = PayWithAmazon;
+
+/**
+ * Off Amazon Payments wrapper
+ *
+ * order of operations
+ *
+ *   button -> address book -> wallet -> consent
+ *
+ * example
+ *
+ *   new PayWithAmazon({
+ *     sellerId: 'abc',
+ *     clientId: 'xyz',
+ *     button: { id: 'pay-with-amazon' },
+ *     addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
+ *     wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
+ *     consent: { id: 'consent' [, width: 400 [, height: 140]]}
+ *   });
+ *
+ * @param {Object} opts
+ * @param {String} opts.sellerId
+ * @param {String} opts.clientId
+ * @param {Object|String} opts.button if string, sets opts.button.id
+ * @param {String} opts.button.id
+ * @param {String} [opts.button.type] 'large' (default), 'small'
+ * @param {String} [opts.button.color] 'Gold' (default), 'LightGray', 'DarkGray'
+ * @param {Object|String} opts.wallet
+ * @param {String} opts.wallet.id
+ * @param {Number} [opts.wallet.width]
+ * @param {Number} [opts.wallet.height]
+ * @param {Object|String} [opts.addressBook]
+ * @param {String} opts.addressBook.id
+ * @param {Number} [opts.addressBook.width]
+ * @param {Number} [opts.addressBook.height]
+ * @param {Object|String} opts.consent
+ * @param {String} opts.consent.id
+ * @param {Number} [opts.consent.width]
+ * @param {Number} [opts.consent.height]
+ */
+
+function PayWithAmazon (opts) {
+  if (!(this instanceof PayWithAmazon)) return new PayWithAmazon(opts);
+
+  this.configure(opts);
+
+  this.billingAgreementId = null;
+  this.consent = undefined;
+  this.widgets = {};
+  this._status = this.status();
+
+  this.setBillingAgreementId = bind(this, this.setBillingAgreementId);
+  this.initWallet = bind(this, this.initWallet);
+  this.initConsent = bind(this, this.initConsent);
+  this.setConsent = bind(this, this.setConsent);
+  this.error = bind(this, this.error);
+  this.init = bind(this, this.init);
+
+  if ('window.OffAmazonPayments' in window) {
+    this.init();
+  } else {
+    document.write('<script src="'
+      + 'https://static-na.payments-amazon.com/OffAmazonPayments'
+      + '/us/sandbox/js/Widgets.js?sellerId='
+      + this.config.sellerId
+      + '"></script>');
+
+    window.onAmazonLoginReady = this.init;
   }
 
-  var module = require.modules[resolved];
-
-  // perform real require()
-  // by invoking the module's
-  // registered function
-  if (!module._resolving && !module.exports) {
-    var mod = {};
-    mod.exports = {};
-    mod.client = mod.component = true;
-    module._resolving = true;
-    module.call(this, mod.exports, require.relative(resolved), mod);
-    delete module._resolving;
-    module.exports = mod.exports;
-  }
-
-  return module.exports;
+  return this;
 }
 
 /**
- * Registered modules.
+ * PayWithAmazon inherits Emitter
  */
 
-require.modules = {};
+Emitter(PayWithAmazon.prototype);
 
 /**
- * Registered aliases.
+ * Version
  */
 
-require.aliases = {};
+PayWithAmazon.prototype.version = '1.0.1';
 
 /**
- * Resolve `path`.
+ * Configures the instance based on passed `opts`
  *
- * Lookup:
+ * Throws errors if the opts are insufficient to configure the instance,
+ * and sets defaults for those not specified.
  *
- *   - PATH/index.js
- *   - PATH.js
- *   - PATH
- *
- * @param {String} path
- * @return {String} path or null
- * @api private
+ * See initializer for description of `opts`
  */
 
-require.resolve = function(path) {
-  if (path.charAt(0) === '/') path = path.slice(1);
+PayWithAmazon.prototype.configure = function (opts) {
+  if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
 
-  var paths = [
-    path,
-    path + '.js',
-    path + '.json',
-    path + '/index.js',
-    path + '/index.json'
-  ];
+  if (!opts.sellerId) throw new Error('opts.sellerId is required.');
+  if (!opts.clientId) throw new Error('opts.clientId is required.');
+  if (!opts.button) throw new Error('opts.button is required.');
+  if (!opts.wallet) throw new Error('opts.wallet is required.');
+  if (!opts.consent) throw new Error('opts.consent is required.');
 
-  for (var i = 0; i < paths.length; i++) {
-    var path = paths[i];
-    if (require.modules.hasOwnProperty(path)) return path;
-    if (require.aliases.hasOwnProperty(path)) return require.aliases[path];
+  if (typeof opts.button === 'string') opts.button = { id: opts.button };
+  if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
+  if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
+  if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
+
+  opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+  opts.button.color = opts.button.color || 'Gold';
+
+  opts.wallet.width = (opts.wallet.width || 400) + 'px';
+  opts.wallet.height = (opts.wallet.height || 260) + 'px';
+
+  opts.consent.width = (opts.consent.width || 400) + 'px';
+  opts.consent.height = (opts.consent.height || 140) + 'px';
+
+  if (opts.addressBook) {
+    opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
+    opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
+  }
+
+  this.config = opts;
+};
+
+/**
+ * Initialized the Amazon plugin
+ *
+ * Sets the client ID then waits for the widget classes to load
+ * before initializing the login button.
+ */
+
+PayWithAmazon.prototype.init = function () {
+  window.amazon.Login.setClientId(this.config.clientId);
+
+  var self = this;
+  var pollId = setInterval(poll, 200);
+
+  function poll () {
+    if (!window.OffAmazonPayments.Button) return;
+    clearTimeout(pollId);
+    self.initButton();
   }
 };
 
 /**
- * Normalize `path` relative to the current path.
+ * Returns an object describing the customer state
  *
- * @param {String} curr
- * @param {String} path
- * @return {String}
- * @api private
+ * @return {Object} customer state
  */
 
-require.normalize = function(curr, path) {
-  var segs = [];
+PayWithAmazon.prototype.status = function () {
+  var id = this.billingAgreementId;
+  var consent = this.consent;
+  var status = {};
 
-  if ('.' != path.charAt(0)) return path;
-
-  curr = curr.split('/');
-  path = path.split('/');
-
-  for (var i = 0; i < path.length; ++i) {
-    if ('..' == path[i]) {
-      curr.pop();
-    } else if ('.' != path[i] && '' != path[i]) {
-      segs.push(path[i]);
-    }
+  if (!id) {
+    status.error = 'Billing agreement ID has not been set.';
   }
 
-  return curr.concat(segs).join('/');
+  if (consent !== undefined) {
+    status.consent = consent;
+  }
+
+  if (consent === undefined) {
+    status.error = 'Billing consent not yet given.';
+  } else if (!consent) {
+    status.error = 'Billing consent not given.';
+  }
+
+  if (!status.error) {
+    status.id = id;
+  }
+
+  return status;
 };
 
 /**
- * Register module at `path` with callback `definition`.
- *
- * @param {String} path
- * @param {Function} definition
- * @api private
+ * Emits the 'change' event if the customer status has changed
  */
 
-require.register = function(path, definition) {
-  require.modules[path] = definition;
+PayWithAmazon.prototype.check = function () {
+  var status = this.status();
+  if (JSON.stringify(status) !== JSON.stringify(this._status)) {
+    this._status = status;
+    this.emit('change', status);
+  }
 };
 
 /**
- * Alias a module definition.
- *
- * @param {String} from
- * @param {String} to
- * @api private
+ * Initializes the login button
  */
 
-require.alias = function(from, to) {
-  if (!require.modules.hasOwnProperty(from)) {
-    throw new Error('Failed to alias "' + from + '", it does not exist');
-  }
-  require.aliases[to] = from;
+PayWithAmazon.prototype.initButton = function () {
+  var self = this;
+  var type = this.config.button.type;
+  var color = this.config.button.color;
+
+  this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
+    type: type,
+    color: color,
+    authorization: function () {
+      var opts = {
+        scope: 'profile payments:widget payments:shipping_address',
+        popup: true
+      };
+
+      window.amazon.Login.authorize(opts, function (res) {
+        if (res.error) return self.error(res.error);
+        self.emit('login');
+        self.initAddressBook();
+      });
+    },
+    onError: this.error
+  });
 };
 
 /**
- * Return a require function relative to the `parent` path.
- *
- * @param {String} parent
- * @return {Function}
- * @api private
+ * Initializes the Address Book widget
  */
 
-require.relative = function(parent) {
-  var p = require.normalize(parent, '..');
+PayWithAmazon.prototype.initAddressBook = function () {
+  var self = this;
 
-  /**
-   * lastIndexOf helper.
-   */
+  if (!this.config.addressBook) return this.initWallet();
 
-  function lastIndexOf(arr, obj) {
-    var i = arr.length;
-    while (i--) {
-      if (arr[i] === obj) return i;
-    }
-    return -1;
-  }
-
-  /**
-   * The relative require() itself.
-   */
-
-  function localRequire(path) {
-    var resolved = localRequire.resolve(path);
-    return require(resolved, parent, path);
-  }
-
-  /**
-   * Resolve relative to the parent.
-   */
-
-  localRequire.resolve = function(path) {
-    var c = path.charAt(0);
-    if ('/' == c) return path.slice(1);
-    if ('.' == c) return require.normalize(p, path);
-
-    // resolve deps by returning
-    // the dep in the nearest "deps"
-    // directory
-    var segs = parent.split('/');
-    var i = lastIndexOf(segs, 'deps') + 1;
-    if (!i) i = 0;
-    path = segs.slice(0, i + 1).join('/') + '/deps/' + path;
-    return path;
+  var opts = {
+    agreementType: 'BillingAgreement',
+    sellerId: this.config.sellerId,
+    onReady: function (ref) {
+      self.emit('ready.addressBook');
+      self.setBillingAgreementId(ref);
+    },
+    onAddressSelect: this.initWallet,
+    design: { size: this.config.addressBook },
+    onError: this.error
   };
 
-  /**
-   * Check if module is defined at `path`.
-   */
+  this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
+  this.widgets.addressBook.bind(this.config.addressBook.id);
+};
 
-  localRequire.exists = function(path) {
-    return require.modules.hasOwnProperty(localRequire.resolve(path));
+/**
+ * Initializes the wallet widget
+ */
+
+PayWithAmazon.prototype.initWallet = function () {
+  var self = this;
+  var opts = {
+    amazonBillingAgreementId: this.billingAgreementId,
+    sellerId: this.config.sellerId,
+    design: { size: this.config.wallet },
+    onReady: function (ref) {
+      self.emit('ready.wallet');
+      if (!self.billingAgreementId) {
+        self.setBillingAgreementId(ref);
+      }
+    },
+    onPaymentSelect: function () {
+      self.initConsent();
+      self.check();
+    },
+    onError: this.error
   };
 
-  return localRequire;
+  if (!this.billingAgreementId) {
+    opts.agreementType = 'BillingAgreement';
+  }
+
+  this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
+  this.widgets.wallet.bind(this.config.wallet.id);
 };
-require.register("component-emitter/index.js", function(exports, require, module){
+
+/**
+ * Initializes the consent widget
+ */
+
+PayWithAmazon.prototype.initConsent = function () {
+  var self = this;
+  var opts = {
+    amazonBillingAgreementId: this.billingAgreementId,
+    sellerId: this.config.sellerId,
+    design: { size: this.config.consent },
+    onReady: function (consentStatus) {
+      self.emit('ready.consent');
+      self.setConsent(consentStatus);
+    },
+    onConsent: this.setConsent,
+    onError: this.error
+  };
+
+  this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
+  this.widgets.consent.bind(this.config.consent.id);
+};
+
+/**
+ * Sets the billingAgreementId based on a widgit init reference
+ */
+
+PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
+  this.billingAgreementId = ref.getAmazonBillingAgreementId();
+  this.check();
+};
+
+/**
+ * Sets consent state based on an Amazon ConsentStatus
+ */
+
+PayWithAmazon.prototype.setConsent = function (consentStatus) {
+  if (typeof consentStatus.getConsentStatus === 'undefined') return;
+  this.consent = consentStatus.getConsentStatus() === 'true';
+  this.check();
+};
+
+/**
+ * Handles errors, logging to console and emitting via the 'error' event
+ */
+
+PayWithAmazon.prototype.error = function (err) {
+  var error = {
+    code: err.getErrorCode(),
+    message: err.getErrorMessage()
+  };
+
+  if (console) {
+    if (Error.captureStackTrace) {
+      Error.captureStackTrace(error, this.error);
+    }
+    console.error(error);
+  }
+
+  this.emit('error', error);
+};
+
+}, {"component/emitter":2,"component/bind":3}],
+2: [function(require, module, exports) {
 
 /**
  * Expose `Emitter`.
@@ -366,8 +597,8 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-});
-require.register("component-bind/index.js", function(exports, require, module){
+}, {}],
+3: [function(require, module, exports) {
 /**
  * Slice reference.
  */
@@ -392,349 +623,4 @@ module.exports = function(obj, fn){
   }
 };
 
-});
-require.register("pay-with-amazon/index.js", function(exports, require, module){
-'use strict';
-
-/**
- * Dependencies
- */
-
-var Emitter = require('emitter');
-var bind = require('bind');
-
-/**
- * Exports
- */
-
-module.exports = PayWithAmazon;
-
-/**
- * Off Amazon Payments wrapper
- *
- * order of operations
- *
- *   button -> address book -> wallet -> consent
- *
- * example
- *
- *   new PayWithAmazon({
- *     sellerId: 'abc',
- *     clientId: 'xyz',
- *     button: { id: 'pay-with-amazon' },
- *     addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
- *     wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
- *     consent: { id: 'consent' [, width: 400 [, height: 140]]}
- *   });
- *
- * @param {Object} opts
- * @param {String} opts.sellerId
- * @param {String} opts.clientId
- * @param {Object|String} opts.button if string, sets opts.button.id
- * @param {String} opts.button.id
- * @param {String} [opts.button.type] 'large' (default), 'small'
- * @param {String} [opts.button.color] 'Gold' (default), 'LightGray', 'DarkGray'
- * @param {Object|String} opts.wallet
- * @param {String} opts.wallet.id
- * @param {Number} [opts.wallet.width]
- * @param {Number} [opts.wallet.height]
- * @param {Object|String} [opts.addressBook]
- * @param {String} opts.addressBook.id
- * @param {Number} [opts.addressBook.width]
- * @param {Number} [opts.addressBook.height]
- * @param {Object|String} opts.consent
- * @param {String} opts.consent.id
- * @param {Number} [opts.consent.width]
- * @param {Number} [opts.consent.height]
- */
-
-function PayWithAmazon (opts) {
-  if (!(this instanceof PayWithAmazon)) return new PayWithAmazon(opts);
-
-  this.configure(opts);
-
-  this.billingAgreementId = null;
-  this.consent = undefined;
-  this.widgets = {};
-  this._status = this.status();
-
-  this.setBillingAgreementId = bind(this, this.setBillingAgreementId);
-  this.initWallet = bind(this, this.initWallet);
-  this.initConsent = bind(this, this.initConsent);
-  this.setConsent = bind(this, this.setConsent);
-  this.error = bind(this, this.error);
-  this.init = bind(this, this.init);
-
-  if ('window.OffAmazonPayments' in window) {
-    this.init();
-  } else {
-    document.write('<script src="'
-      + 'https://static-na.payments-amazon.com/OffAmazonPayments'
-      + '/us/sandbox/js/Widgets.js?sellerId='
-      + this.config.sellerId
-      + '"></script>');
-
-    window.onAmazonLoginReady = this.init;
-  }
-
-  return this;
-}
-
-/**
- * PayWithAmazon inherits Emitter
- */
-
-Emitter(PayWithAmazon.prototype);
-
-/**
- * Configures the instance based on passed `opts`
- *
- * Throws errors if the opts are insufficient to configure the instance,
- * and sets defaults for those not specified.
- *
- * See initializer for description of `opts`
- */
-
-PayWithAmazon.prototype.configure = function (opts) {
-  if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
-
-  if (!opts.sellerId) throw new Error('opts.sellerId is required.');
-  if (!opts.clientId) throw new Error('opts.clientId is required.');
-  if (!opts.button) throw new Error('opts.button is required.');
-  if (!opts.wallet) throw new Error('opts.wallet is required.');
-  if (!opts.consent) throw new Error('opts.consent is required.');
-
-  if (typeof opts.button === 'string') opts.button = { id: opts.button };
-  if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
-  if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
-  if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
-
-  opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
-  opts.button.color = opts.button.color || 'Gold';
-
-  opts.wallet.width = (opts.wallet.width || 400) + 'px';
-  opts.wallet.height = (opts.wallet.height || 260) + 'px';
-
-  opts.consent.width = (opts.consent.width || 400) + 'px';
-  opts.consent.height = (opts.consent.height || 140) + 'px';
-
-  if (opts.addressBook) {
-    opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
-    opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
-  }
-
-  this.config = opts;
-};
-
-/**
- * Initialized the Amazon plugin
- *
- * Sets the client ID then waits for the widget classes to load
- * before initializing the login button.
- */
-
-PayWithAmazon.prototype.init = function () {
-  window.amazon.Login.setClientId(this.config.clientId);
-
-  var self = this;
-  var pollId = setInterval(poll, 200);
-
-  function poll () {
-    if (!window.OffAmazonPayments.Button) return;
-    clearTimeout(pollId);
-    self.initButton();
-  }
-};
-
-/**
- * Returns an object describing the customer state
- *
- * @return {Object} customer state
- */
-
-PayWithAmazon.prototype.status = function () {
-  var id = this.billingAgreementId;
-  var consent = this.consent;
-  var status = {};
-
-  if (!id) {
-    status.error = 'Billing agreement ID has not been set.';
-  }
-
-  if (consent !== undefined) {
-    status.consent = consent;
-  }
-
-  if (consent === undefined) {
-    status.error = 'Billing consent not yet given.';
-  } else if (!consent) {
-    status.error = 'Billing consent not given.';
-  }
-
-  if (!status.error) {
-    status.id = id;
-  }
-
-  return status;
-};
-
-/**
- * Emits the 'change' event if the customer status has changed
- */
-
-PayWithAmazon.prototype.check = function () {
-  var status = this.status();
-  if (JSON.stringify(status) !== JSON.stringify(this._status)) {
-    this._status = status;
-    this.emit('change', status);
-  }
-};
-
-/**
- * Initializes the login button
- */
-
-PayWithAmazon.prototype.initButton = function () {
-  var self = this;
-  var type = this.config.button.type;
-  var color = this.config.button.color;
-
-  this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
-    type: type,
-    color: color,
-    authorization: function () {
-      var opts = {
-        scope: 'profile payments:widget payments:shipping_address',
-        popup: true
-      };
-
-      window.amazon.Login.authorize(opts, function (res) {
-        if (res.error) return self.error(res.error);
-        self.initAddressBook();
-      });
-    },
-    onError: this.error
-  });
-};
-
-/**
- * Initializes the Address Book widget
- */
-
-PayWithAmazon.prototype.initAddressBook = function () {
-  if (!this.config.addressBook) return this.initWallet();
-
-  var opts = {
-    agreementType: 'BillingAgreement',
-    sellerId: this.config.sellerId,
-    onReady: this.setBillingAgreementId,
-    onAddressSelect: this.initWallet,
-    design: { size: this.config.addressBook },
-    onError: this.error
-  };
-
-  this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
-  this.widgets.addressBook.bind(this.config.addressBook.id);
-};
-
-/**
- * Initializes the wallet widget
- */
-
-PayWithAmazon.prototype.initWallet = function () {
-  var self = this;
-  var opts = {
-    amazonBillingAgreementId: this.billingAgreementId,
-    sellerId: this.config.sellerId,
-    design: { size: this.config.wallet },
-    onPaymentSelect: function () {
-      self.initConsent();
-      self.check();
-    },
-    onError: this.error
-  };
-
-  if (!this.billingAgreementId) {
-    opts.agreementType = 'BillingAgreement';
-    opts.onReady = this.setBillingAgreementId;
-  }
-
-  this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
-  this.widgets.wallet.bind(this.config.wallet.id);
-};
-
-/**
- * Initializes the consent widget
- */
-
-PayWithAmazon.prototype.initConsent = function () {
-  var opts = {
-    amazonBillingAgreementId: this.billingAgreementId,
-    sellerId: this.config.sellerId,
-    design: { size: this.config.consent },
-    onReady: this.setConsent,
-    onConsent: this.setConsent,
-    onError: this.error
-  };
-
-  this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
-  this.widgets.consent.bind(this.config.consent.id);
-};
-
-/**
- * Sets the billingAgreementId based on a widgit init reference
- */
-
-PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
-  this.billingAgreementId = ref.getAmazonBillingAgreementId();
-  this.check();
-};
-
-/**
- * Sets consent state based on an Amazon ConsentStatus
- */
-
-PayWithAmazon.prototype.setConsent = function (consentStatus) {
-  if (typeof consentStatus.getConsentStatus === 'undefined') return;
-  this.consent = consentStatus.getConsentStatus() === 'true';
-  this.check();
-};
-
-/**
- * Handles errors, logging to console and emitting via the 'error' event
- */
-
-PayWithAmazon.prototype.error = function (err) {
-  var error = {
-    code: err.getErrorCode(),
-    message: err.getErrorMessage()
-  };
-
-  if (console) {
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(error, this.error);
-    }
-    console.error(error);
-  }
-
-  this.emit('error', error);
-};
-
-});
-
-
-
-
-require.alias("component-emitter/index.js", "pay-with-amazon/deps/emitter/index.js");
-require.alias("component-emitter/index.js", "emitter/index.js");
-
-require.alias("component-bind/index.js", "pay-with-amazon/deps/bind/index.js");
-require.alias("component-bind/index.js", "bind/index.js");
-
-require.alias("pay-with-amazon/index.js", "pay-with-amazon/index.js");if (typeof exports == "object") {
-  module.exports = require("pay-with-amazon");
-} else if (typeof define == "function" && define.amd) {
-  define([], function(){ return require("pay-with-amazon"); });
-} else {
-  this["PayWithAmazon"] = require("pay-with-amazon");
-}})();
+}, {}]}, {}, {"1":"PayWithAmazon"})
