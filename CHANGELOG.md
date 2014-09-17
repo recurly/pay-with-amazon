@@ -1,5 +1,10 @@
 ## Pay with Amazon CHANGELOG
 
+### Version 1.0.1 (September 17, 2014)
+
+- Switches build system to Duo
+- Adds new events: 'login', 'ready.addressBook', 'ready.wallet', 'ready.consent'
+
 ### Version 1.0.0 (September 3, 2014)
 
-* Initial release
+- Initial release
