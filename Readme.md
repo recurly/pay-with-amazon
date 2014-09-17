@@ -176,7 +176,7 @@
   Whenever the customer logs in. This may be used to hide the login button, or
   perform other page transitions.
 
-  **Emits:** nothing.
+  **Emits:** Nothing.
 
 #### ready.addressBook
 
@@ -246,6 +246,9 @@
   }); 
   ```
 
+## Contributing
+
+  [See Contributing file][contributing]
 
 ## Compatibility
 
@@ -254,7 +257,7 @@
 ## Notes
 
 ##### 1
-  Amazon's' widgets use methods that will otherwise fail if they are not
+  Amazon's widgets use methods that will otherwise fail if they are not
   invoked from the document `<head>`.
 
 ## License
@@ -287,3 +290,4 @@
 [button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
 [amazon-docs]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_Introduction.html
 [recurly-docs]: https://docs.recurly.com/payment-gateways/amazon-payments
+[contributing]: CONTRIBUTING.md
