@@ -122,15 +122,25 @@ PayWithAmazon.prototype.configure = function (opts) {
   opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
   opts.button.color = opts.button.color || 'Gold';
 
-  opts.wallet.width = (opts.wallet.width || 400) + 'px';
-  opts.wallet.height = (opts.wallet.height || 260) + 'px';
+  if (opts.wallet.width || opts.wallet.height) {
+    opts.wallet.dimensions = {
+      width: dimension(opts.wallet.width || 400),
+      height: dimension(opts.wallet.height || 260)
+    };
+  }
 
-  opts.consent.width = (opts.consent.width || 400) + 'px';
-  opts.consent.height = (opts.consent.height || 140) + 'px';
+  if (opts.consent.width || opts.consent.height) {
+    opts.consent.dimensions = {
+      width: dimension(opts.consent.width || 400),
+      height: dimension(opts.consent.height || 140)
+    };
+  }
 
-  if (opts.addressBook) {
-    opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
-    opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
+  if (opts.addressBook && (opts.addressBook.width || opts.addressBook.height)) {
+    opts.addressBook.dimensions = {
+      width: dimension(opts.addressBook.width || 400),
+      height: dimension(opts.addressBook.height || 260)
+    };
   }
 
   this.config = opts;
@@ -245,7 +255,7 @@ PayWithAmazon.prototype.initAddressBook = function () {
       self.setBillingAgreementId(ref);
     },
     onAddressSelect: this.initWallet,
-    design: { size: this.config.addressBook },
+    design: design(this.config.addressBook),
     onError: this.error
   };
 
@@ -262,7 +272,7 @@ PayWithAmazon.prototype.initWallet = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: { size: this.config.wallet },
+    design: design(this.config.wallet),
     onReady: function (ref) {
       self.emit('ready.wallet');
       if (!self.billingAgreementId) {
@@ -293,7 +303,7 @@ PayWithAmazon.prototype.initConsent = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: { size: this.config.consent },
+    design: design(this.config.consent),
     onReady: function (consentStatus) {
       self.emit('ready.consent');
       self.setConsent(consentStatus);
@@ -344,3 +354,28 @@ PayWithAmazon.prototype.error = function (err) {
 
   this.emit('error', error);
 };
+
+/**
+ * Given a number or string, returns a properly-formatted dimension string
+ *
+ * @param {Number|String} dim
+ * @returns {String}
+ */
+
+function dimension (dim) {
+  return dim + isNaN(parseInt(dim.charAt(dim.length - 1), 10)) ? '' : 'px';
+}
+
+/**
+ * Given a widget configuration, returns a properly-formatted design spec
+ *
+ * @param {Object} widget Widget options hash
+ */
+
+function design (widget) {
+  if (widget.dimensions) {
+    return { size: widget };
+  } else {
+    return { designMode: 'responsive' };
+  }
+}
