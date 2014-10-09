@@ -135,6 +135,7 @@ module.exports = PayWithAmazon;
  * @param {String} opts.consent.id
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
+ * @param {String} [opts.openedClass]
  */
 
 function PayWithAmazon (opts) {
@@ -227,6 +228,8 @@ PayWithAmazon.prototype.configure = function (opts) {
       height: dimension(opts.addressBook.height || 260)
     };
   }
+
+  opts.openedClass = opts.openedClass || 'open';
 
   this.config = opts;
 };
@@ -346,6 +349,7 @@ PayWithAmazon.prototype.initAddressBook = function () {
 
   this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
   this.widgets.addressBook.bind(this.config.addressBook.id);
+  this.opened(this.config.addressBook.id);
 };
 
 /**
@@ -377,6 +381,7 @@ PayWithAmazon.prototype.initWallet = function () {
 
   this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
   this.widgets.wallet.bind(this.config.wallet.id);
+  this.opened(this.config.wallet.id);
 };
 
 /**
@@ -399,6 +404,7 @@ PayWithAmazon.prototype.initConsent = function () {
 
   this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
   this.widgets.consent.bind(this.config.consent.id);
+  this.opened(this.config.consent.id);
 };
 
 /**
@@ -418,6 +424,15 @@ PayWithAmazon.prototype.setConsent = function (consentStatus) {
   if (typeof consentStatus.getConsentStatus === 'undefined') return;
   this.consent = consentStatus.getConsentStatus() === 'true';
   this.check();
+};
+
+/**
+ * Adds a class to opened widget containers
+ */
+
+PayWithAmazon.prototype.opened = function (id) {
+  var elem = document.getElementById(id);
+  if (elem) elem.className = elem.className + ' ' + this.config.openedClass;
 };
 
 /**
