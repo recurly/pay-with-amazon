@@ -8,8 +8,10 @@
     <title>Pay with Amazon example usage</title>
     <link rel="stylesheet" href="style.css">
     <style>
+      /**
+       * Sets up dimensions of the widgets in a responsive way
+       */
       #address-book.open, #wallet.open, #consent.open {
-        background-color: gray;
         min-width: 300px;
         max-width: 600px;
         min-height: 260px;
@@ -31,7 +33,7 @@
         window.location.protocol = 'https';
       }
     </script>
-    <script src="pay-with-amazon.responsive.js"></script>
+    <script src="pay-with-amazon.js"></script>
     <script>
       // For recurring transactions, all widgets: wallet, address book, and consent
       var payWithAmazon = new PayWithAmazon({
@@ -74,12 +76,5 @@
     <div id="output">
       Pending
     </div>
-
-    <h3>Other examples</h2>
-
-    <ul>
-      <li><a href="recurring-no-address-book.html">Recurring transactions, no address book</a></li>
-      <li><a href="mobile.html">Mobile</a></li>
-    </ul>
   </body>
 </html>
