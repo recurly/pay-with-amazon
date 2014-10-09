@@ -135,6 +135,7 @@ module.exports = PayWithAmazon;
  * @param {String} opts.consent.id
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
+ * @param {String} [opts.openedClass]
  */
 
 function PayWithAmazon (opts) {
@@ -207,16 +208,28 @@ PayWithAmazon.prototype.configure = function (opts) {
   opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
   opts.button.color = opts.button.color || 'Gold';
 
-  opts.wallet.width = (opts.wallet.width || 400) + 'px';
-  opts.wallet.height = (opts.wallet.height || 260) + 'px';
-
-  opts.consent.width = (opts.consent.width || 400) + 'px';
-  opts.consent.height = (opts.consent.height || 140) + 'px';
-
-  if (opts.addressBook) {
-    opts.addressBook.width = (opts.addressBook.width || 400) + 'px';
-    opts.addressBook.height = (opts.addressBook.height || 260) + 'px';
+  if (opts.wallet.width || opts.wallet.height) {
+    opts.wallet.dimensions = {
+      width: dimension(opts.wallet.width || 400),
+      height: dimension(opts.wallet.height || 260)
+    };
   }
+
+  if (opts.consent.width || opts.consent.height) {
+    opts.consent.dimensions = {
+      width: dimension(opts.consent.width || 400),
+      height: dimension(opts.consent.height || 140)
+    };
+  }
+
+  if (opts.addressBook && (opts.addressBook.width || opts.addressBook.height)) {
+    opts.addressBook.dimensions = {
+      width: dimension(opts.addressBook.width || 400),
+      height: dimension(opts.addressBook.height || 260)
+    };
+  }
+
+  opts.openedClass = opts.openedClass || 'open';
 
   this.config = opts;
 };
@@ -330,12 +343,13 @@ PayWithAmazon.prototype.initAddressBook = function () {
       self.setBillingAgreementId(ref);
     },
     onAddressSelect: this.initWallet,
-    design: { size: this.config.addressBook },
+    design: design(this.config.addressBook),
     onError: this.error
   };
 
   this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
   this.widgets.addressBook.bind(this.config.addressBook.id);
+  this.opened(this.config.addressBook.id);
 };
 
 /**
@@ -347,7 +361,7 @@ PayWithAmazon.prototype.initWallet = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: { size: this.config.wallet },
+    design: design(this.config.wallet),
     onReady: function (ref) {
       self.emit('ready.wallet');
       if (!self.billingAgreementId) {
@@ -367,6 +381,7 @@ PayWithAmazon.prototype.initWallet = function () {
 
   this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
   this.widgets.wallet.bind(this.config.wallet.id);
+  this.opened(this.config.wallet.id);
 };
 
 /**
@@ -378,7 +393,7 @@ PayWithAmazon.prototype.initConsent = function () {
   var opts = {
     amazonBillingAgreementId: this.billingAgreementId,
     sellerId: this.config.sellerId,
-    design: { size: this.config.consent },
+    design: design(this.config.consent),
     onReady: function (consentStatus) {
       self.emit('ready.consent');
       self.setConsent(consentStatus);
@@ -389,6 +404,7 @@ PayWithAmazon.prototype.initConsent = function () {
 
   this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
   this.widgets.consent.bind(this.config.consent.id);
+  this.opened(this.config.consent.id);
 };
 
 /**
@@ -411,6 +427,15 @@ PayWithAmazon.prototype.setConsent = function (consentStatus) {
 };
 
 /**
+ * Adds a class to opened widget containers
+ */
+
+PayWithAmazon.prototype.opened = function (id) {
+  var elem = document.getElementById(id);
+  if (elem) elem.className = elem.className + ' ' + this.config.openedClass;
+};
+
+/**
  * Handles errors, logging to console and emitting via the 'error' event
  */
 
@@ -429,6 +454,32 @@ PayWithAmazon.prototype.error = function (err) {
 
   this.emit('error', error);
 };
+
+/**
+ * Given a number or string, returns a properly-formatted dimension string
+ *
+ * @param {Number|String} dim
+ * @returns {String}
+ */
+
+function dimension (dim) {
+  dim = dim + '';
+  return dim + (isNaN(parseInt(dim.charAt(dim.length - 1), 10)) ? '' : 'px');
+}
+
+/**
+ * Given a widget configuration, returns a properly-formatted design spec
+ *
+ * @param {Object} widget Widget options hash
+ */
+
+function design (widget) {
+  if (widget.dimensions) {
+    return { size: widget.dimensions };
+  } else {
+    return { designMode: 'responsive' };
+  }
+}
 
 }, {"component/emitter":2,"component/bind":3}],
 2: [function(require, module, exports) {
