@@ -85,6 +85,16 @@
   </body>
   ```
 
+### Styling
+
+  If widget dimensions are not passed in directly, PayWithAmazon will rely
+  upon the dimensions of their container elements.
+
+  PayWithAmazon will add a class to each widget container, `'open'` by default,
+  but customizable by the `openedClass` option. This allows more robust styling
+  than simply specifying dimensions. For an example of how this enables the
+  widgets to be sized responsively, see the [responsive demo][responsive-demo]
+
 ## API
 
 ### PayWithAmazon(opts)
@@ -99,6 +109,7 @@
   wallet | Object/String | [wallet options](#wallet-options). If String, sets wallet.id
   [addressBook] | Object/String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id
   consent | Object/String | [conset options](#consent-options). If String, sets consent.id
+  [openedClass] | String | Class name to add to containers once their widgets have been opened. Defaults to 'open'
 
 #### button options
 
@@ -285,6 +296,7 @@
   THE SOFTWARE.
 
 [demo]: https://recurly.github.io/pay-with-amazon/
+[responsive-demo]: https://recurly.github.io/pay-with-amazon/responsive.html
 [download]: https://github.com/recurly/pay-with-amazon/releases
 [error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
 [button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
