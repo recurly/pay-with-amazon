@@ -1,6 +1,6 @@
 
 # Pay with Amazon
-  
+
   Simple subscription billing with Amazon!
 
   [Demo][demo]
@@ -105,6 +105,7 @@
   ----- | ---- | -----------
   sellerId | String | Amazon Seller ID
   clientId | String | Amazon Client ID
+  production | Boolean | Whether to use production widgets (defaults to false)
   button | Object/String | [button options](#button-options). If String, sets button.id
   wallet | Object/String | [wallet options](#wallet-options). If String, sets wallet.id
   [addressBook] | Object/String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id
@@ -231,14 +232,14 @@
   widgets. This would display the Amazon address, payment and consent widgets.
 
   ```js
-  var payWithAmazon = new PayWithAmazon({     
-    sellerId: 'ABC',     
-    clientId: 'XYZ',     
-    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
-    addressBook: { id: 'address-book', width: 400, height: 260 },     
-    wallet: { id: 'wallet', width: 400, height: 260 },     
-    consent: { id: 'consent', width: 400, height: 140 } 
-  }); 
+  var payWithAmazon = new PayWithAmazon({
+    sellerId: 'ABC',
+    clientId: 'XYZ',
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },
+    addressBook: { id: 'address-book', width: 400, height: 260 },
+    wallet: { id: 'wallet', width: 400, height: 260 },
+    consent: { id: 'consent', width: 400, height: 140 }
+  });
   ```
 
 ### Case 2: No Address Widget
@@ -248,13 +249,13 @@
   remove the Amazon address widget.
 
   ```js
-  var payWithAmazon = new PayWithAmazon({     
-    sellerId: 'ABC',     
-    clientId: 'XYZ',     
-    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },     
-    wallet: { id: 'wallet', width: 400, height: 260 },     
-    consent: { id: 'consent', width: 400, height: 140 } 
-  }); 
+  var payWithAmazon = new PayWithAmazon({
+    sellerId: 'ABC',
+    clientId: 'XYZ',
+    button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },
+    wallet: { id: 'wallet', width: 400, height: 260 },
+    consent: { id: 'consent', width: 400, height: 140 }
+  });
   ```
 
 ## Contributing

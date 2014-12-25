@@ -34,6 +34,7 @@ module.exports = PayWithAmazon;
  * @param {Object} opts
  * @param {String} opts.sellerId
  * @param {String} opts.clientId
+ * @param {Boolean} opts.production Whether to use the production widgets (defaults to false)
  * @param {Object|String} opts.button if string, sets opts.button.id
  * @param {String} opts.button.id
  * @param {String} [opts.button.type] 'large' (default), 'small'
@@ -74,8 +75,9 @@ function PayWithAmazon (opts) {
     this.init();
   } else {
     document.write('<script src="'
-      + 'https://static-na.payments-amazon.com/OffAmazonPayments'
-      + '/us/sandbox/js/Widgets.js?sellerId='
+      + 'https://static-na.payments-amazon.com/OffAmazonPayments/us'
+      + (this.config.production ? '' : '/sandbox')
+      + '/js/Widgets.js?sellerId='
       + this.config.sellerId
       + '"></script>');
 
@@ -144,6 +146,7 @@ PayWithAmazon.prototype.configure = function (opts) {
     };
   }
 
+  opts.production = typeof opts.production === 'boolean' ? opts.production : false;
   opts.openedClass = opts.openedClass || 'open';
 
   this.config = opts;
