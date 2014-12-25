@@ -1,5 +1,9 @@
 ## Pay with Amazon CHANGELOG
 
+### Version 1.0.3 (December 25, 2014)
+
+- Adds production option
+
 ### Version 1.0.2 (October 9, 2014)
 
 - Adds class-based style support, to allow for responsive widget sizing
