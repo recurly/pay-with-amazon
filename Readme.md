@@ -105,7 +105,7 @@
   ----- | ---- | -----------
   sellerId | String | Amazon Seller ID
   clientId | String | Amazon Client ID
-  production | Boolean | Whether to use production widgets (defaults to false)
+  [production] | Boolean | Whether to use production widgets (defaults to false)
   button | Object/String | [button options](#button-options). If String, sets button.id
   wallet | Object/String | [wallet options](#wallet-options). If String, sets wallet.id
   [addressBook] | Object/String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id
