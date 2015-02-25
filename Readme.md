@@ -119,6 +119,7 @@
   id | String | DOM node id in which the Amazon login button will be placed
   [type] | String | 'large' (default), 'small' [See button guide][button-guide]
   [color] | String | 'Gold' (default), 'LightGray', 'DarkGray' [See button guide][button-guide]
+  [kind] | String | 'pay' (default), 'login' [See button guide][button-guide]
 
 #### wallet options
 

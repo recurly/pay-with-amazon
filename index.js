@@ -122,7 +122,12 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
   if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
 
-  opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+  if (opts.button.kind === 'login') {
+    opts.button.type = opts.button.type === 'small' ? 'Login' : 'LwA';
+  } else {
+    opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+  }
+
   opts.button.color = opts.button.color || 'Gold';
 
   if (opts.wallet.width || opts.wallet.height) {
