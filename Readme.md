@@ -300,8 +300,8 @@
 [demo]: https://recurly.github.io/pay-with-amazon/
 [responsive-demo]: https://recurly.github.io/pay-with-amazon/responsive.html
 [download]: https://github.com/recurly/pay-with-amazon/releases
-[error-codes]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_ErrorHandling.html#APAGuide_ErrorHandling__table_A767CBA7D23A4C938855A0255528FB81
-[button-guide]: http://docs.developer.amazonservices.com/en_US/apa_guide/APAGuide_ButtonGallery.html
-[amazon-docs]: http://docs.developer.amazonservices.com/en_US/pay_with_amazon_automatic_payments/APAGuide_Introduction.html
+[error-codes]: https://payments.amazon.com/developer/documentation/lpwa/201954960
+[button-guide]: https://payments.amazon.com/developer/documentation/lpwa/201953980
+[amazon-docs]: https://payments.amazon.com/developer/documentation/lpwa/201985870
 [recurly-docs]: https://docs.recurly.com/payment-gateways/amazon-payments
 [contributing]: CONTRIBUTING.md
