@@ -2,7 +2,7 @@
   "name": "pay-with-amazon",
   "repo": "recurly/pay-with-amazon",
   "description": "Easy Amazon Payments",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "keywords": ["amazon", "payments", "billing", "recurly"],
   "dependencies": {
     "component/emitter": "1.1.3",

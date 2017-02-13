@@ -97,7 +97,7 @@ Emitter(PayWithAmazon.prototype);
  * Version
  */
 
-PayWithAmazon.prototype.version = '1.0.3';
+PayWithAmazon.prototype.version = '1.0.4';
 
 /**
  * Configures the instance based on passed `opts`

@@ -1,5 +1,10 @@
 ## Pay with Amazon CHANGELOG
 
+### Version 1.0.4 (February 13, 2017)
+
+- Fixes initialization API availability check
+- Adds login response payload to 'login' event
+
 ### Version 1.0.3 (December 25, 2014)
 
 - Adds production option
