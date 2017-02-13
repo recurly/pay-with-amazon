@@ -71,7 +71,7 @@ function PayWithAmazon (opts) {
   this.error = bind(this, this.error);
   this.init = bind(this, this.init);
 
-  if ('window.OffAmazonPayments' in window) {
+  if ('OffAmazonPayments' in window) {
     this.init();
   } else {
     document.write('<script src="'
@@ -241,7 +241,7 @@ PayWithAmazon.prototype.initButton = function () {
 
       window.amazon.Login.authorize(opts, function (res) {
         if (res.error) return self.error(res.error);
-        self.emit('login');
+        self.emit('login', res);
         self.initAddressBook();
       });
     },
