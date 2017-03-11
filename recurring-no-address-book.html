@@ -20,8 +20,8 @@
         clientId: 'amzn1.application-oa2-client.127b0a3e68334641a3e4e129f686d140',
         sellerId: 'A35095BGBGQR66',
         button: 'pay-with-amazon',
-        wallet: 'wallet',
-        consent: 'consent'
+        wallet: { id: 'wallet', width: 400 },
+        consent: { id: 'consent', width: 400 }
       }).on('change', notify);
 
       function notify (status) {
