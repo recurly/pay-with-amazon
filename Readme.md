@@ -72,6 +72,20 @@
   });
   ```
 
+  To add EU support, simply include the `region` parameter:
+
+  ```js
+  var payWithAmazon = new PayWithAmazon({
+    sellerId: 'ABC',
+    clientId: 'XYZ',
+    button: { id: 'pay-with-amazon', [type], [color] },
+    addressBook: { id: 'address-book', [width], [height] },
+    wallet: { id: 'wallet', [width], [height] },
+    consent: { id: 'consent', [width], [height] },
+    region: 'eu'
+  });
+  ```
+
   For this example, the `<body>` would need to contain the following elements:
 
   ```html
