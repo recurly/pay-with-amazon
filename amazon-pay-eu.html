@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html>
   <head>
@@ -17,12 +18,13 @@
     <script>
       // For recurring transactions, all widgets: wallet, address book, and consent
       var payWithAmazon = new PayWithAmazon({
-        clientId: 'amzn1.application-oa2-client.127b0a3e68334641a3e4e129f686d140',
-        sellerId: 'A35095BGBGQR66',
+        clientId: 'amzn1.application-oa2-client.daa5e630b7894618aea083ad818be5ac',
+        sellerId: 'A3ACT5FPBQRX2Z',
         button: 'pay-with-amazon',
         wallet: { id: 'wallet', width: 400 },
         consent: { id: 'consent', width: 400 },
-        addressBook: { id: 'address-book', width: 400 }
+        addressBook: { id: 'address-book', width: 400 },
+        region: 'eu'
       }).on('change', notify);
 
       function notify (status) {
@@ -46,7 +48,7 @@
 
     <dl>
       <dt>Email</dt>
-      <dd>test-user-1@recurly.com</dd>
+      <dd>test-user-1+eu@recurly.com</dd>
       <dt>Password</dt>
       <dd>password</dd>
     </dl>
@@ -63,7 +65,7 @@
       <li><a href="recurring-no-address-book.html">Recurring transactions, no address book</a></li>
       <li><a href="mobile.html">Mobile</a></li>
       <li><a href="responsive.html">Responsive</a></li>
-      <li><a href="amazon-pay-eu.html">Amazon Pay EU</a></li>
+      <li><a href="index.html">Amazon Pay US</a></li>
     </ul>
   </body>
 </html>
