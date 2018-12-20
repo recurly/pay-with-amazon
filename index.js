@@ -29,7 +29,6 @@ module.exports = PayWithAmazon;
  *     addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
  *     wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
  *     consent: { id: 'consent' [, width: 400 [, height: 140]]},
- *     region: 'eu'
  *   });
  *
  * @param {Object} opts
@@ -53,7 +52,7 @@ module.exports = PayWithAmazon;
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
  * @param {String} [opts.openedClass]
- * @param {String} [opts.region]
+ * @param {String} [opts.region] 'us' (default), 'eu', 'uk'
  */
 
 function PayWithAmazon (opts) {
@@ -183,16 +182,20 @@ PayWithAmazon.prototype.init = function () {
  */
 PayWithAmazon.prototype.getAssetPath = function () {
   var env = this.config.production ? '' : '/sandbox';
-  if (this.config.region == 'eu') {
-    return 'https://static-eu.payments-amazon.com/OffAmazonPayments/eur'
-      + env
-      + '/lpa/js/Widgets.js?sellerId='
-      + this.config.sellerId;
+  var assetPath;
+
+  switch (this.config.region) {
+    case 'eu':
+      assetPath = 'https://static-eu.payments-amazon.com/OffAmazonPayments/eur' + env + '/lpa/js/Widgets.js?sellerId=';
+      break;
+    case 'uk':
+      assetPath = 'https://static-eu.payments-amazon.com/OffAmazonPayments/gbp' + env + '/lpa/js/Widgets.js?sellerId=';
+      break;
+    default:
+      assetPath = 'https://static-na.payments-amazon.com/OffAmazonPayments/us' + env + '/js/Widgets.js?sellerId=';
+      break;
   }
-  return 'https://static-na.payments-amazon.com/OffAmazonPayments/us'
-      + env
-      + '/js/Widgets.js?sellerId='
-      + this.config.sellerId;
+  return assetPath + this.config.sellerId;
 }
 
 /**
