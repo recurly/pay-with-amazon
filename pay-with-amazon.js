@@ -10,11 +10,10 @@
    * Require `name`.
    *
    * @param {String} name
-   * @param {Boolean} jumped
    * @api public
    */
 
-  function require(name, jumped){
+  function require(name){
     if (cache[name]) return cache[name].exports;
     if (modules[name]) return call(name, require);
     throw new Error('cannot find module "' + name + '"');
@@ -34,14 +33,22 @@
     var mod = modules[id];
     var name = mod[2];
     var fn = mod[0];
+    var threw = true;
 
-    fn.call(m.exports, function(req){
-      var dep = modules[id][1][req];
-      return require(dep ? dep : req);
-    }, m, m.exports, outer, modules, cache, entries);
-
-    // expose as `name`.
-    if (name) cache[name] = cache[id];
+    try {
+      fn.call(m.exports, function(req){
+        var dep = modules[id][1][req];
+        return require(dep || req);
+      }, m, m.exports, outer, modules, cache, entries);
+      threw = false;
+    } finally {
+      if (threw) {
+        delete cache[id];
+      } else if (name) {
+        // expose as 'name'.
+        cache[name] = cache[id];
+      }
+    }
 
     return cache[id].exports;
   }
@@ -114,12 +121,12 @@ module.exports = PayWithAmazon;
  *     addressBook: { id: 'address-book' [, width: 400 [, height: 260]]},
  *     wallet: { id: 'wallet' [, width: 400 [, height: 260]]},
  *     consent: { id: 'consent' [, width: 400 [, height: 140]]},
- *     region: [, 'eu']
  *   });
  *
  * @param {Object} opts
  * @param {String} opts.sellerId
  * @param {String} opts.clientId
+ * @param {Boolean} opts.production Whether to use the production widgets (defaults to false)
  * @param {Object|String} opts.button if string, sets opts.button.id
  * @param {String} opts.button.id
  * @param {String} [opts.button.type] 'large' (default), 'small'
@@ -137,7 +144,7 @@ module.exports = PayWithAmazon;
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
  * @param {String} [opts.openedClass]
- * @param {String} [opts.region=us]
+ * @param {String} [opts.region] 'us' (default), 'eu', 'uk'
  */
 
 function PayWithAmazon (opts) {
@@ -157,10 +164,13 @@ function PayWithAmazon (opts) {
   this.error = bind(this, this.error);
   this.init = bind(this, this.init);
 
-  if ('window.OffAmazonPayments' in window) {
+  if ('OffAmazonPayments' in window) {
     this.init();
   } else {
-    document.write('<script src="' + this.getAssetPath() + '"></script>');
+    document.write('<script src="'
+      + this.getAssetPath()
+      + '"></script>');
+
     window.onAmazonLoginReady = this.init;
   }
 
@@ -177,7 +187,7 @@ Emitter(PayWithAmazon.prototype);
  * Version
  */
 
-PayWithAmazon.prototype.version = '1.0.1';
+PayWithAmazon.prototype.version = '1.0.4';
 
 /**
  * Configures the instance based on passed `opts`
@@ -202,7 +212,12 @@ PayWithAmazon.prototype.configure = function (opts) {
   if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
   if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
 
-  opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+  if (opts.button.kind === 'login') {
+    opts.button.type = opts.button.type === 'small' ? 'Login' : 'LwA';
+  } else {
+    opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+  }
+
   opts.button.color = opts.button.color || 'Gold';
 
   if (opts.wallet.width || opts.wallet.height) {
@@ -226,6 +241,7 @@ PayWithAmazon.prototype.configure = function (opts) {
     };
   }
 
+  opts.production = typeof opts.production === 'boolean' ? opts.production : false;
   opts.openedClass = opts.openedClass || 'open';
 
   this.config = opts;
@@ -258,17 +274,21 @@ PayWithAmazon.prototype.init = function () {
  */
 PayWithAmazon.prototype.getAssetPath = function () {
   var env = this.config.production ? '' : '/sandbox';
-  if (this.config.region == 'eu') {
-    return 'https://static-eu.payments-amazon.com/OffAmazonPayments/eur'
-      + env
-      + '/lpa/js/Widgets.js?sellerId='
-      + this.config.sellerId;
+  var assetPath;
+
+  switch (this.config.region) {
+    case 'eu':
+      assetPath = 'https://static-eu.payments-amazon.com/OffAmazonPayments/eur' + env + '/lpa/js/Widgets.js?sellerId=';
+      break;
+    case 'uk':
+      assetPath = 'https://static-eu.payments-amazon.com/OffAmazonPayments/gbp' + env + '/lpa/js/Widgets.js?sellerId=';
+      break;
+    default:
+      assetPath = 'https://static-na.payments-amazon.com/OffAmazonPayments/us' + env + '/js/Widgets.js?sellerId=';
+      break;
   }
-  return 'https://static-na.payments-amazon.com/OffAmazonPayments/us'
-      + env
-      + '/js/Widgets.js?sellerId='
-      + this.config.sellerId;
-};
+  return assetPath + this.config.sellerId;
+}
 
 /**
  * Returns an object describing the customer state
@@ -334,7 +354,7 @@ PayWithAmazon.prototype.initButton = function () {
 
       window.amazon.Login.authorize(opts, function (res) {
         if (res.error) return self.error(res.error);
-        self.emit('login');
+        self.emit('login', res);
         self.initAddressBook();
       });
     },

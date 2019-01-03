@@ -18,13 +18,13 @@
     <script>
       // For recurring transactions, all widgets: wallet, address book, and consent
       var payWithAmazon = new PayWithAmazon({
-        clientId: 'amzn1.application-oa2-client.daa5e630b7894618aea083ad818be5ac',
-        sellerId: 'A3ACT5FPBQRX2Z',
+        clientId: 'amzn1.application-oa2-client.3309e9932185430fb33484fdc13bdf25',
+        sellerId: 'A1GY3AYSMKVCP0',
         button: 'pay-with-amazon',
         wallet: { id: 'wallet', width: 400 },
         consent: { id: 'consent', width: 400 },
         addressBook: { id: 'address-book', width: 400 },
-        region: 'eu'
+        region: 'uk'
       }).on('change', notify);
 
       function notify (status) {
@@ -48,9 +48,9 @@
 
     <dl>
       <dt>Email</dt>
-      <dd>test-user-1+eu@recurly.com</dd>
+      <dd>test-user+uk@recurly.com</dd>
       <dt>Password</dt>
-      <dd>password</dd>
+      <dd>test-user+uk</dd>
     </dl>
 
     <h3>Output (Amazon Billing Agreement ID)</h3>
@@ -66,7 +66,7 @@
       <li><a href="mobile.html">Mobile</a></li>
       <li><a href="responsive.html">Responsive</a></li>
       <li><a href="index.html">Amazon Pay US</a></li>
-      <li><a href="amazon-pay-uk.html">Amazon Pay UK</a></li>
+      <li><a href="amazon-pay-eu.html">Amazon Pay EU</a></li>
     </ul>
   </body>
 </html>
