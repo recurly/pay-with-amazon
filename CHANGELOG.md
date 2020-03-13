@@ -1,5 +1,10 @@
 ## Pay with Amazon CHANGELOG
 
+### Version 2.0.0 (March 12, 2020)
+
+- Fixes Chrome parser error
+- BREAKING CHANGE: Explicit IE support is now IE11+
+
 ### Version 1.0.4 (February 13, 2017)
 
 - Fixes initialization API availability check

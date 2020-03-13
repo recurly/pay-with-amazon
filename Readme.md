@@ -19,7 +19,7 @@ plans and make purchases using their Amazon account.
 
 This library is platform agnostic, and may be used in any checkout flow to
 make Amazon Payments easier to implement. To learn how use this library with
-your Recurly site, please [Recurly's documentation][recurly-docs] to get started.
+your Recurly site, please see [Recurly's documentation][recurly-docs] to get started.
 
 ## Usage
 
