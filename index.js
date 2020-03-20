@@ -1,17 +1,4 @@
-'use strict';
-
-/**
- * Dependencies
- */
-
-var Emitter = require('component/emitter');
-var bind = require('component/bind');
-
-/**
- * Exports
- */
-
-module.exports = PayWithAmazon;
+import Emitter from 'component-emitter';
 
 /**
  * Off Amazon Payments wrapper
@@ -55,349 +42,317 @@ module.exports = PayWithAmazon;
  * @param {String} [opts.region] 'us' (default), 'eu', 'uk'
  */
 
-function PayWithAmazon (opts) {
-  if (!(this instanceof PayWithAmazon)) return new PayWithAmazon(opts);
+export default class PayWithAmazon extends Emitter {
+  constructor (opts) {
+    super();
+    this.configure(opts);
 
-  this.configure(opts);
+    this.billingAgreementId = null;
+    this.consent = undefined;
+    this.widgets = {};
+    this._status = this.status();
 
-  this.billingAgreementId = null;
-  this.consent = undefined;
-  this.widgets = {};
-  this._status = this.status();
+    this.setBillingAgreementId = this.setBillingAgreementId.bind(this);
+    this.initWallet = this.initWallet.bind(this);
+    this.initConsent = this.initConsent.bind(this);
+    this.setConsent = this.setConsent.bind(this);
+    this.error = this.error.bind(this);
+    this.init = this.init.bind(this);
 
-  this.setBillingAgreementId = bind(this, this.setBillingAgreementId);
-  this.initWallet = bind(this, this.initWallet);
-  this.initConsent = bind(this, this.initConsent);
-  this.setConsent = bind(this, this.setConsent);
-  this.error = bind(this, this.error);
-  this.init = bind(this, this.init);
+    if ('OffAmazonPayments' in window) {
+      this.init();
+    } else {
+      window.onAmazonLoginReady = this.init;
 
-  if ('OffAmazonPayments' in window) {
-    this.init();
-  } else {
-    document.write('<script src="'
-      + this.getAssetPath()
-      + '"></script>');
-
-    window.onAmazonLoginReady = this.init;
-  }
-
-  return this;
-}
-
-/**
- * PayWithAmazon inherits Emitter
- */
-
-Emitter(PayWithAmazon.prototype);
-
-/**
- * Version
- */
-
-PayWithAmazon.prototype.version = '1.0.4';
-
-/**
- * Configures the instance based on passed `opts`
- *
- * Throws errors if the opts are insufficient to configure the instance,
- * and sets defaults for those not specified.
- *
- * See initializer for description of `opts`
- */
-
-PayWithAmazon.prototype.configure = function (opts) {
-  if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
-
-  if (!opts.sellerId) throw new Error('opts.sellerId is required.');
-  if (!opts.clientId) throw new Error('opts.clientId is required.');
-  if (!opts.button) throw new Error('opts.button is required.');
-  if (!opts.wallet) throw new Error('opts.wallet is required.');
-  if (!opts.consent) throw new Error('opts.consent is required.');
-
-  if (typeof opts.button === 'string') opts.button = { id: opts.button };
-  if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
-  if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
-  if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
-
-  if (opts.button.kind === 'login') {
-    opts.button.type = opts.button.type === 'small' ? 'Login' : 'LwA';
-  } else {
-    opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
-  }
-
-  opts.button.color = opts.button.color || 'Gold';
-
-  if (opts.wallet.width || opts.wallet.height) {
-    opts.wallet.dimensions = {
-      width: dimension(opts.wallet.width || 400),
-      height: dimension(opts.wallet.height || 260)
-    };
-  }
-
-  if (opts.consent.width || opts.consent.height) {
-    opts.consent.dimensions = {
-      width: dimension(opts.consent.width || 400),
-      height: dimension(opts.consent.height || 140)
-    };
-  }
-
-  if (opts.addressBook && (opts.addressBook.width || opts.addressBook.height)) {
-    opts.addressBook.dimensions = {
-      width: dimension(opts.addressBook.width || 400),
-      height: dimension(opts.addressBook.height || 260)
-    };
-  }
-
-  opts.production = typeof opts.production === 'boolean' ? opts.production : false;
-  opts.openedClass = opts.openedClass || 'open';
-
-  this.config = opts;
-};
-
-/**
- * Initialized the Amazon plugin
- *
- * Sets the client ID then waits for the widget classes to load
- * before initializing the login button.
- */
-
-PayWithAmazon.prototype.init = function () {
-  window.amazon.Login.setClientId(this.config.clientId);
-
-  var self = this;
-  var pollId = setInterval(poll, 200);
-
-  function poll () {
-    if (!window.OffAmazonPayments.Button) return;
-    clearTimeout(pollId);
-    self.initButton();
-  }
-};
-
-/**
- * Returns the url for Amazon widgets based on region url param
- *
- * @return {String} url
- */
-PayWithAmazon.prototype.getAssetPath = function () {
-  var env = this.config.production ? '' : '/sandbox';
-  var assetPath;
-
-  switch (this.config.region) {
-    case 'eu':
-      assetPath = 'https://static-eu.payments-amazon.com/OffAmazonPayments/eur' + env + '/lpa/js/Widgets.js?sellerId=';
-      break;
-    case 'uk':
-      assetPath = 'https://static-eu.payments-amazon.com/OffAmazonPayments/gbp' + env + '/lpa/js/Widgets.js?sellerId=';
-      break;
-    default:
-      assetPath = 'https://static-na.payments-amazon.com/OffAmazonPayments/us' + env + '/js/Widgets.js?sellerId=';
-      break;
-  }
-  return assetPath + this.config.sellerId;
-}
-
-/**
- * Returns an object describing the customer state
- *
- * @return {Object} customer state
- */
-
-PayWithAmazon.prototype.status = function () {
-  var id = this.billingAgreementId;
-  var consent = this.consent;
-  var status = {};
-
-  if (!id) {
-    status.error = 'Billing agreement ID has not been set.';
-  }
-
-  if (consent !== undefined) {
-    status.consent = consent;
-  }
-
-  if (consent === undefined) {
-    status.error = 'Billing consent not yet given.';
-  } else if (!consent) {
-    status.error = 'Billing consent not given.';
-  }
-
-  if (!status.error) {
-    status.id = id;
-  }
-
-  return status;
-};
-
-/**
- * Emits the 'change' event if the customer status has changed
- */
-
-PayWithAmazon.prototype.check = function () {
-  var status = this.status();
-  if (JSON.stringify(status) !== JSON.stringify(this._status)) {
-    this._status = status;
-    this.emit('change', status);
-  }
-};
-
-/**
- * Initializes the login button
- */
-
-PayWithAmazon.prototype.initButton = function () {
-  var self = this;
-  var type = this.config.button.type;
-  var color = this.config.button.color;
-
-  this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
-    type: type,
-    color: color,
-    authorization: function () {
-      var opts = {
-        scope: 'profile payments:widget payments:shipping_address',
-        popup: true
-      };
-
-      window.amazon.Login.authorize(opts, function (res) {
-        if (res.error) return self.error(res.error);
-        self.emit('login', res);
-        self.initAddressBook();
-      });
-    },
-    onError: this.error
-  });
-};
-
-/**
- * Initializes the Address Book widget
- */
-
-PayWithAmazon.prototype.initAddressBook = function () {
-  var self = this;
-
-  if (!this.config.addressBook) return this.initWallet();
-
-  var opts = {
-    agreementType: 'BillingAgreement',
-    sellerId: this.config.sellerId,
-    onReady: function (ref) {
-      self.emit('ready.addressBook');
-      self.setBillingAgreementId(ref);
-    },
-    onAddressSelect: this.initWallet,
-    design: design(this.config.addressBook),
-    onError: this.error
-  };
-
-  this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
-  this.widgets.addressBook.bind(this.config.addressBook.id);
-  this.opened(this.config.addressBook.id);
-};
-
-/**
- * Initializes the wallet widget
- */
-
-PayWithAmazon.prototype.initWallet = function () {
-  var self = this;
-  var opts = {
-    amazonBillingAgreementId: this.billingAgreementId,
-    sellerId: this.config.sellerId,
-    design: design(this.config.wallet),
-    onReady: function (ref) {
-      self.emit('ready.wallet');
-      if (!self.billingAgreementId) {
-        self.setBillingAgreementId(ref);
-      }
-    },
-    onPaymentSelect: function () {
-      self.initConsent();
-      self.check();
-    },
-    onError: this.error
-  };
-
-  if (!this.billingAgreementId) {
-    opts.agreementType = 'BillingAgreement';
-  }
-
-  this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
-  this.widgets.wallet.bind(this.config.wallet.id);
-  this.opened(this.config.wallet.id);
-};
-
-/**
- * Initializes the consent widget
- */
-
-PayWithAmazon.prototype.initConsent = function () {
-  var self = this;
-  var opts = {
-    amazonBillingAgreementId: this.billingAgreementId,
-    sellerId: this.config.sellerId,
-    design: design(this.config.consent),
-    onReady: function (consentStatus) {
-      self.emit('ready.consent');
-      self.setConsent(consentStatus);
-    },
-    onConsent: this.setConsent,
-    onError: this.error
-  };
-
-  this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
-  this.widgets.consent.bind(this.config.consent.id);
-  this.opened(this.config.consent.id);
-};
-
-/**
- * Sets the billingAgreementId based on a widgit init reference
- */
-
-PayWithAmazon.prototype.setBillingAgreementId = function (ref) {
-  this.billingAgreementId = ref.getAmazonBillingAgreementId();
-  this.check();
-};
-
-/**
- * Sets consent state based on an Amazon ConsentStatus
- */
-
-PayWithAmazon.prototype.setConsent = function (consentStatus) {
-  if (typeof consentStatus.getConsentStatus === 'undefined') return;
-  this.consent = consentStatus.getConsentStatus() === 'true';
-  this.check();
-};
-
-/**
- * Adds a class to opened widget containers
- */
-
-PayWithAmazon.prototype.opened = function (id) {
-  var elem = document.getElementById(id);
-  if (elem) elem.className = elem.className + ' ' + this.config.openedClass;
-};
-
-/**
- * Handles errors, logging to console and emitting via the 'error' event
- */
-
-PayWithAmazon.prototype.error = function (err) {
-  var error = {
-    code: err.getErrorCode(),
-    message: err.getErrorMessage()
-  };
-
-  if (console) {
-    if (Error.captureStackTrace) {
-      Error.captureStackTrace(error, this.error);
+      var script = document.createElement('script');
+      script.src = this.getAssetPath();
+      document.head.appendChild(script);
     }
-    console.error(error);
+
+    return this;
   }
 
-  this.emit('error', error);
-};
+  version = '1.0.4';
+
+  /**
+   * Configures the instance based on passed `opts`
+   *
+   * Throws errors if the opts are insufficient to configure the instance,
+   * and sets defaults for those not specified.
+   *
+   * See initializer for description of `opts`
+   */
+
+  configure (opts) {
+    if (typeof opts !== 'object') throw new Error ('opts must be provided as an object.');
+
+    if (!opts.sellerId) throw new Error('opts.sellerId is required.');
+    if (!opts.clientId) throw new Error('opts.clientId is required.');
+    if (!opts.button) throw new Error('opts.button is required.');
+    if (!opts.wallet) throw new Error('opts.wallet is required.');
+    if (!opts.consent) throw new Error('opts.consent is required.');
+
+    if (typeof opts.button === 'string') opts.button = { id: opts.button };
+    if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
+    if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
+    if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
+
+    if (opts.button.kind === 'login') {
+      opts.button.type = opts.button.type === 'small' ? 'Login' : 'LwA';
+    } else {
+      opts.button.type = opts.button.type === 'small' ? 'Pay' : 'PwA';
+    }
+
+    opts.button.color = opts.button.color || 'Gold';
+
+    if (opts.wallet.width || opts.wallet.height) {
+      opts.wallet.dimensions = {
+        width: dimension(opts.wallet.width || 400),
+        height: dimension(opts.wallet.height || 260)
+      };
+    }
+
+    if (opts.consent.width || opts.consent.height) {
+      opts.consent.dimensions = {
+        width: dimension(opts.consent.width || 400),
+        height: dimension(opts.consent.height || 140)
+      };
+    }
+
+    if (opts.addressBook && (opts.addressBook.width || opts.addressBook.height)) {
+      opts.addressBook.dimensions = {
+        width: dimension(opts.addressBook.width || 400),
+        height: dimension(opts.addressBook.height || 260)
+      };
+    }
+
+    opts.production = typeof opts.production === 'boolean' ? opts.production : false;
+    opts.openedClass = opts.openedClass || 'open';
+
+    this.config = opts;
+  }
+
+  /**
+   * Initialized the Amazon plugin
+   *
+   * Sets the client ID then waits for the widget classes to load
+   * before initializing the login button.
+   */
+
+  init () {
+    window.amazon.Login.setClientId(this.config.clientId);
+
+    var self = this;
+    var pollId = setInterval(poll, 200);
+
+    function poll () {
+      if (!window.OffAmazonPayments.Button) return;
+      clearTimeout(pollId);
+      self.initButton();
+    }
+  }
+
+  /**
+   * Returns an object describing the customer state
+   *
+   * @return {Object} customer state
+   */
+
+  status () {
+    var id = this.billingAgreementId;
+    var consent = this.consent;
+    var status = {};
+
+    if (!id) {
+      status.error = 'Billing agreement ID has not been set.';
+    }
+
+    if (consent !== undefined) {
+      status.consent = consent;
+    }
+
+    if (consent === undefined) {
+      status.error = 'Billing consent not yet given.';
+    } else if (!consent) {
+      status.error = 'Billing consent not given.';
+    }
+
+    if (!status.error) {
+      status.id = id;
+    }
+
+    return status;
+  }
+
+  /**
+   * Emits the 'change' event if the customer status has changed
+   */
+
+  check () {
+    var status = this.status();
+    if (JSON.stringify(status) !== JSON.stringify(this._status)) {
+      this._status = status;
+      this.emit('change', status);
+    }
+  }
+
+  /**
+   * Initializes the login button
+   */
+
+  initButton () {
+    var self = this;
+    var type = this.config.button.type;
+    var color = this.config.button.color;
+
+    this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
+      type: type,
+      color: color,
+      authorization: function () {
+        var opts = {
+          scope: 'profile payments:widget payments:shipping_address',
+          popup: true
+        };
+
+        window.amazon.Login.authorize(opts, function (res) {
+          if (res.error) return self.error(res.error);
+          self.emit('login', res);
+          self.initAddressBook();
+        });
+      },
+      onError: this.error
+    });
+  }
+
+  /**
+   * Initializes the Address Book widget
+   */
+
+  initAddressBook () {
+    var self = this;
+
+    if (!this.config.addressBook) return this.initWallet();
+
+    var opts = {
+      agreementType: 'BillingAgreement',
+      sellerId: this.config.sellerId,
+      onReady: function (ref) {
+        self.emit('ready.addressBook');
+        self.setBillingAgreementId(ref);
+      },
+      onAddressSelect: this.initWallet,
+      design: design(this.config.addressBook),
+      onError: this.error
+    };
+
+    this.widgets.addressBook = new window.OffAmazonPayments.Widgets.AddressBook(opts);
+    this.widgets.addressBook.bind(this.config.addressBook.id);
+    this.opened(this.config.addressBook.id);
+  }
+
+  /**
+   * Initializes the wallet widget
+   */
+
+  initWallet () {
+    var self = this;
+    var opts = {
+      amazonBillingAgreementId: this.billingAgreementId,
+      sellerId: this.config.sellerId,
+      design: design(this.config.wallet),
+      onReady: function (ref) {
+        self.emit('ready.wallet');
+        if (!self.billingAgreementId) {
+          self.setBillingAgreementId(ref);
+        }
+      },
+      onPaymentSelect: function () {
+        self.initConsent();
+        self.check();
+      },
+      onError: this.error
+    };
+
+    if (!this.billingAgreementId) {
+      opts.agreementType = 'BillingAgreement';
+    }
+
+    this.widgets.wallet = new window.OffAmazonPayments.Widgets.Wallet(opts);
+    this.widgets.wallet.bind(this.config.wallet.id);
+    this.opened(this.config.wallet.id);
+  }
+
+  /**
+   * Initializes the consent widget
+   */
+
+  initConsent () {
+    var self = this;
+    var opts = {
+      amazonBillingAgreementId: this.billingAgreementId,
+      sellerId: this.config.sellerId,
+      design: design(this.config.consent),
+      onReady: function (consentStatus) {
+        self.emit('ready.consent');
+        self.setConsent(consentStatus);
+      },
+      onConsent: this.setConsent,
+      onError: this.error
+    };
+
+    this.widgets.consent = new window.OffAmazonPayments.Widgets.Consent(opts);
+    this.widgets.consent.bind(this.config.consent.id);
+    this.opened(this.config.consent.id);
+  }
+
+  /**
+   * Sets the billingAgreementId based on a widgit init reference
+   */
+
+  setBillingAgreementId (ref) {
+    this.billingAgreementId = ref.getAmazonBillingAgreementId();
+    this.check();
+  }
+
+  /**
+   * Sets consent state based on an Amazon ConsentStatus
+   */
+
+  setConsent (consentStatus) {
+    if (typeof consentStatus.getConsentStatus === 'undefined') return;
+    this.consent = consentStatus.getConsentStatus() === 'true';
+    this.check();
+  }
+
+  /**
+   * Adds a class to opened widget containers
+   */
+
+  opened (id) {
+    var elem = document.getElementById(id);
+    if (elem) elem.className = elem.className + ' ' + this.config.openedClass;
+  }
+
+  /**
+   * Handles errors, logging to console and emitting via the 'error' event
+   */
+
+  error (err) {
+    var error = {
+      code: err.getErrorCode(),
+      message: err.getErrorMessage()
+    };
+
+    if (console) {
+      if (Error.captureStackTrace) {
+        Error.captureStackTrace(error, this.error);
+      }
+      console.error(error);
+    }
+
+    this.emit('error', error);
+  }
+}
 
 /**
  * Given a number or string, returns a properly-formatted dimension string
