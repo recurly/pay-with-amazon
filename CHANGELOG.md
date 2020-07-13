@@ -1,5 +1,9 @@
 ## Pay with Amazon CHANGELOG
 
+### Version 2.0.1 (Jul 13, 2020)
+
+- Fixes asset path determination
+
 ### Version 2.0.0 (March 12, 2020)
 
 - Fixes Chrome parser error

@@ -74,7 +74,7 @@ export default class PayWithAmazon extends Emitter {
     return this;
   }
 
-  version = '1.0.4';
+  version = '2.0.1';
 
   get assetPath () {
     const { production } = this.config;
