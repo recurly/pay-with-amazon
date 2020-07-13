@@ -1,5 +1,7 @@
 import Emitter from 'component-emitter';
 
+const ASSET_BASE_PATH = 'https://static-na.payments-amazon.com/OffAmazonPayments/us';
+
 /**
  * Off Amazon Payments wrapper
  *
@@ -65,7 +67,7 @@ export default class PayWithAmazon extends Emitter {
       window.onAmazonLoginReady = this.init;
 
       var script = document.createElement('script');
-      script.src = this.getAssetPath();
+      script.src = this.assetPath;
       document.head.appendChild(script);
     }
 
@@ -73,6 +75,13 @@ export default class PayWithAmazon extends Emitter {
   }
 
   version = '1.0.4';
+
+  get assetPath () {
+    const { production } = this.config;
+    let basePath = ASSET_BASE_PATH;
+    if (production) basePath += '/sandbox';
+    return `${basePath}/js/Widgets.js?sellerId=${this.config.sellerId}`;
+  }
 
   /**
    * Configures the instance based on passed `opts`
