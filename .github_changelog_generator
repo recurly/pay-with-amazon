@@ -1,0 +1,6 @@
+user=recurly
+project=pay-with-amazon
+unreleased=true
+exclude-labels=question,bug?,internal,dependency,documentation,tests & build
+issues-wo-labels=false
+verbose=false
