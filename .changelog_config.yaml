@@ -1,0 +1,11 @@
+---
+owner: recurly
+repo: pay-with-amazon
+exclude_labels:
+  - bug?
+  - internal
+  - duplicate
+  - question
+  - dependency
+  - documentation
+  - tests & build
