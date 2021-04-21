@@ -1,7 +1,5 @@
 import Emitter from 'component-emitter';
 
-const ASSET_BASE_PATH = 'https://static-na.payments-amazon.com/OffAmazonPayments/us';
-
 /**
  * Off Amazon Payments wrapper
  *
@@ -78,10 +76,16 @@ export default class PayWithAmazon extends Emitter {
   version = '2.0.1';
 
   get assetPath () {
-    const { production } = this.config;
-    let basePath = ASSET_BASE_PATH;
-    if (production) basePath += '/sandbox';
-    return `${basePath}/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    const { production, region } = this.config;
+    const env = production ? '' : '/sandbox';
+
+    if (region === 'eu') {
+      return `https://static-eu.payments-amazon.com/OffAmazonPayments/eur${env}/lpa/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    } else if (region === 'uk') {
+      return `https://static-eu.payments-amazon.com/OffAmazonPayments/gbp${env}/lpa/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    } else {
+      return `https://static-na.payments-amazon.com/OffAmazonPayments/us${env}/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    }
   }
 
   /**
