@@ -23,7 +23,7 @@
         wallet: { id: 'wallet', width: 400 },
         consent: { id: 'consent', width: 400 },
         addressBook: { id: 'address-book', width: 400 },
-        authorizationScope: ['postal_code']
+        additionalLoginScope: ['postal_code']
       }).on('change', notify);
 
       function notify (status) {
