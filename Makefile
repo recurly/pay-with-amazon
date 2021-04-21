@@ -12,6 +12,9 @@ build/pay-with-amazon.js: index.js node_modules
 	@mkdir -p $(@D)
 	@$(webpack) --display-reasons --display-chunks
 
+build_pages: build
+	cp build/pay-with-amazon.min.js pages/pay-with-amazon.js
+
 node_modules: package.json
 	@npm install --silent
 
