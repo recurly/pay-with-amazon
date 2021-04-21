@@ -1,1 +1,1 @@
-[See master branch](https://github.com/recurly/pay-with-amazon)
+[See main branch](https://github.com/recurly/pay-with-amazon)
