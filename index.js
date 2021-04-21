@@ -42,6 +42,7 @@ const ASSET_BASE_PATH = 'https://static-na.payments-amazon.com/OffAmazonPayments
  * @param {Number} [opts.consent.height]
  * @param {String} [opts.openedClass]
  * @param {String} [opts.region] 'us' (default), 'eu', 'uk'
+ * @param {Array|String} [opts.authorizationScope] [] (default)
  */
 
 export default class PayWithAmazon extends Emitter {
@@ -105,6 +106,7 @@ export default class PayWithAmazon extends Emitter {
     if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
     if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
     if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
+    if (typeof opts.authorizationScope === 'string') opts.authorizationScope = [opts.authorizationScope];
 
     if (opts.button.kind === 'login') {
       opts.button.type = opts.button.type === 'small' ? 'Login' : 'LwA';
@@ -137,6 +139,7 @@ export default class PayWithAmazon extends Emitter {
 
     opts.production = typeof opts.production === 'boolean' ? opts.production : false;
     opts.openedClass = opts.openedClass || 'open';
+    opts.authorizationScope = opts.authorizationScope || [];
 
     this.config = opts;
   }
@@ -213,13 +216,15 @@ export default class PayWithAmazon extends Emitter {
     var self = this;
     var type = this.config.button.type;
     var color = this.config.button.color;
+    var defaultScope = ['profile', 'payments:widget', 'payments:shipping_address'];
+    var scope = defaultScope.concat(this.config.authorizationScope).join(' ');
 
     this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
       type: type,
       color: color,
       authorization: function () {
         var opts = {
-          scope: 'profile payments:widget payments:shipping_address',
+          scope: scope,
           popup: true
         };
 
