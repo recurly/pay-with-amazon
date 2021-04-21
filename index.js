@@ -1,7 +1,5 @@
 import Emitter from 'component-emitter';
 
-const ASSET_BASE_PATH = 'https://static-na.payments-amazon.com/OffAmazonPayments/us';
-
 /**
  * Off Amazon Payments wrapper
  *
@@ -42,6 +40,7 @@ const ASSET_BASE_PATH = 'https://static-na.payments-amazon.com/OffAmazonPayments
  * @param {Number} [opts.consent.height]
  * @param {String} [opts.openedClass]
  * @param {String} [opts.region] 'us' (default), 'eu', 'uk'
+ * @param {Array|String} [opts.additionalLoginScope] [] (default)
  */
 
 export default class PayWithAmazon extends Emitter {
@@ -77,10 +76,16 @@ export default class PayWithAmazon extends Emitter {
   version = '2.0.1';
 
   get assetPath () {
-    const { production } = this.config;
-    let basePath = ASSET_BASE_PATH;
-    if (production) basePath += '/sandbox';
-    return `${basePath}/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    const { production, region } = this.config;
+    const env = production ? '' : '/sandbox';
+
+    if (region === 'eu') {
+      return `https://static-eu.payments-amazon.com/OffAmazonPayments/eur${env}/lpa/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    } else if (region === 'uk') {
+      return `https://static-eu.payments-amazon.com/OffAmazonPayments/gbp${env}/lpa/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    } else {
+      return `https://static-na.payments-amazon.com/OffAmazonPayments/us${env}/js/Widgets.js?sellerId=${this.config.sellerId}`;
+    }
   }
 
   /**
@@ -105,6 +110,7 @@ export default class PayWithAmazon extends Emitter {
     if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
     if (typeof opts.consent === 'string') opts.consent = { id: opts.consent };
     if (typeof opts.addressBook === 'string') opts.addressBook = { id: opts.addressBook };
+    if (typeof opts.additionalLoginScope === 'string') opts.additionalLoginScope = [opts.additionalLoginScope];
 
     if (opts.button.kind === 'login') {
       opts.button.type = opts.button.type === 'small' ? 'Login' : 'LwA';
@@ -137,6 +143,7 @@ export default class PayWithAmazon extends Emitter {
 
     opts.production = typeof opts.production === 'boolean' ? opts.production : false;
     opts.openedClass = opts.openedClass || 'open';
+    opts.additionalLoginScope = opts.additionalLoginScope || [];
 
     this.config = opts;
   }
@@ -213,13 +220,15 @@ export default class PayWithAmazon extends Emitter {
     var self = this;
     var type = this.config.button.type;
     var color = this.config.button.color;
+    var requiredScope = ['profile', 'payments:widget', 'payments:shipping_address'];
+    var scope = requiredScope.concat(this.config.additionalLoginScope).join(' ');
 
     this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
       type: type,
       color: color,
       authorization: function () {
         var opts = {
-          scope: 'profile payments:widget payments:shipping_address',
+          scope: scope,
           popup: true
         };
 
