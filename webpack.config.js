@@ -62,7 +62,6 @@ module.exports = {
     ]
   },
   devServer: {
-    disableHostCheck: true,
-    host: 'js.lvh.me'
+    disableHostCheck: true
   }
 };
