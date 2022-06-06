@@ -123,7 +123,7 @@ clientId | String | Amazon Client ID
 button | Object/String | [button options](#button-options). If String, sets button.id
 wallet | Object/String | [wallet options](#wallet-options). If String, sets wallet.id
 [addressBook] | Object/String | [addressBook options](#addressbook-options). If excluded, customers will interact solely with the wallet and consent widgets. If String, sets addressBook.id
-consent | Object/String | [conset options](#consent-options). If String, sets consent.id
+[consent] | Object/String | [conset options](#consent-options). If excluded, customers will not need to give a consent. If String, sets consent.id
 [openedClass] | String | Class name to add to containers once their widgets have been opened. Defaults to 'open'
 
 #### button options
@@ -189,11 +189,19 @@ Whenever the customer makes a change to their billing agreement.
 }
 ```
 
+If the consent is not required:
+
+```js
+{
+  id: 'abc-xyz' // Amazon billing agreement id.
+}
+```
+
 And in case of an error:
 
 ```js
 {
-  consent: false, // May be true or false
+  consent: false, // May be true, false or not present if the consent is not required
   error: 'Billing consent not given.' // A brief description of the error
 }
 ```
@@ -207,19 +215,19 @@ perform other page transitions.
 
 #### ready.addressBook
 
-The address book widget has finished laoding and is now displayed on the page.
+The address book widget has finished loading and is now displayed on the page.
 
 **Emits:** Nothing.
 
 #### ready.wallet
 
-The wallet widget has finished laoding and is now displayed on the page.
+The wallet widget has finished loading and is now displayed on the page.
 
 **Emits:** Nothing.
 
 #### ready.consent
 
-The consent widget has finished laoding and is now displayed on the page.
+The consent widget has finished loading and is now displayed on the page.
 
 **Emits:** Nothing.
 
@@ -270,6 +278,20 @@ var payWithAmazon = new PayWithAmazon({
   button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },
   wallet: { id: 'wallet', width: 400, height: 260 },
   consent: { id: 'consent', width: 400, height: 140 }
+});
+```
+
+### Case 3: No Consent Widget
+
+You may not want the customer consent in your checkout experience. In this case, you can remove the Amazon Consent widget.
+
+```js
+var payWithAmazon = new PayWithAmazon({
+  sellerId: 'ABC',
+  clientId: 'XYZ',
+  button: { id: 'pay-with-amazon', type: 'large', color: 'DarkGray' },
+  addressBook: { id: 'address-book', width: 400, height: 260 },
+  wallet: { id: 'wallet', width: 400, height: 260 },
 });
 ```
 
