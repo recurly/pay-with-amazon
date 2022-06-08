@@ -1,0 +1,77 @@
+
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="Example usage of the Pay with Amazon browser module">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pay with Amazon example usage</title>
+    <link rel="stylesheet" href="style.css">
+    <script>
+      // Optional -- Enforces SSL on github pages
+      if (window.location.host === 'recurly.github.io' && window.location.protocol !== 'https:') {
+        window.location.protocol = 'https';
+      }
+    </script>
+    <script src="pay-with-amazon.js"></script>
+    <script>
+      // For recurring transactions, all widgets: wallet, address book, and consent
+      var payWithAmazon = new PayWithAmazon({
+        clientId: 'amzn1.application-oa2-client.daa5e630b7894618aea083ad818be5ac',
+        sellerId: 'A3ACT5FPBQRX2Z',
+        button: 'pay-with-amazon',
+        wallet: { id: 'wallet', width: 400 },
+        consent: { id: 'consent', width: 400 },
+        addressBook: { id: 'address-book', width: 400 },
+        region: 'eu'
+      }).on('change', notify);
+
+      function notify (status) {
+        console && console.log.apply(console, arguments);
+
+        if (status.id) {
+          document.querySelector('#output').innerHTML = status.id;
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <h2>All widgets, for recurring transactions</h2>
+
+    <div id="pay-with-amazon"></div>
+    <div id="address-book"></div>
+    <div id="wallet"></div>
+    <div id="consent"></div>
+
+    <h3>Login</h3>
+
+    <dl>
+      <dt>Email</dt>
+      <dd>test-user-1+eu@recurly.com</dd>
+      <dt>Password</dt>
+      <dd>password</dd>
+    </dl>
+
+    <h3>Output (Amazon Billing Agreement ID)</h3>
+
+    <div id="output">
+      Pending
+    </div>
+
+    <div>
+      <h3>Other examples</h2>
+
+      <ul>
+        <li><a href="index.html">Amazon Pay US</a></li>
+        <li><a href="recurring-no-address-book.html">Recurring transactions, no address book</a></li>
+        <li><a href="mobile.html">Mobile</a></li>
+        <li><a href="responsive.html">Responsive</a></li>
+        <li><a href="additional-login-scopes.html">Additional login scopes</a></li>
+        <li class="selected"><a href="amazon-pay-eu.html">Amazon Pay EU</a></li>
+        <li><a href="amazon-pay-uk.html">Amazon Pay UK</a></li>
+        <li><a href="no-consent.html">Without consent</a></li>
+      </ul>
+    </div>
+  </body>
+</html>
