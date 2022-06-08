@@ -2,3 +2,8 @@ html {
   padding: 0;
   margin: 0;
 }
+
+li.selected a {
+  color: #0d9e69;
+  font-weight: bold;
+}

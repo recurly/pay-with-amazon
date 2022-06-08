@@ -34,8 +34,8 @@ import Emitter from 'component-emitter';
  * @param {String} opts.addressBook.id
  * @param {Number} [opts.addressBook.width]
  * @param {Number} [opts.addressBook.height]
- * @param {Object|String} opts.consent
- * @param {String} opts.consent.id
+ * @param {Object|String} [opts.consent]
+ * @param {String} [opts.consent.id]
  * @param {Number} [opts.consent.width]
  * @param {Number} [opts.consent.height]
  * @param {String} [opts.openedClass]
@@ -88,6 +88,10 @@ export default class PayWithAmazon extends Emitter {
     }
   }
 
+  get requiresConsent() {
+    return !!this.config.consent;
+  }
+
   /**
    * Configures the instance based on passed `opts`
    *
@@ -104,7 +108,6 @@ export default class PayWithAmazon extends Emitter {
     if (!opts.clientId) throw new Error('opts.clientId is required.');
     if (!opts.button) throw new Error('opts.button is required.');
     if (!opts.wallet) throw new Error('opts.wallet is required.');
-    if (!opts.consent) throw new Error('opts.consent is required.');
 
     if (typeof opts.button === 'string') opts.button = { id: opts.button };
     if (typeof opts.wallet === 'string') opts.wallet = { id: opts.wallet };
@@ -127,7 +130,7 @@ export default class PayWithAmazon extends Emitter {
       };
     }
 
-    if (opts.consent.width || opts.consent.height) {
+    if (opts.consent && (opts.consent.width || opts.consent.height)) {
       opts.consent.dimensions = {
         width: dimension(opts.consent.width || 400),
         height: dimension(opts.consent.height || 140)
@@ -183,14 +186,16 @@ export default class PayWithAmazon extends Emitter {
       status.error = 'Billing agreement ID has not been set.';
     }
 
-    if (consent !== undefined) {
-      status.consent = consent;
-    }
+    if (this.requiresConsent) {
+      if (consent !== undefined) {
+        status.consent = consent;
+      }
 
-    if (consent === undefined) {
-      status.error = 'Billing consent not yet given.';
-    } else if (!consent) {
-      status.error = 'Billing consent not given.';
+      if (consent === undefined) {
+        status.error = 'Billing consent not yet given.';
+      } else if (!consent) {
+        status.error = 'Billing consent not given.';
+      }
     }
 
     if (!status.error) {
@@ -221,6 +226,9 @@ export default class PayWithAmazon extends Emitter {
     var type = this.config.button.type;
     var color = this.config.button.color;
     var requiredScope = ['profile', 'payments:widget', 'payments:shipping_address'];
+    if (!this.requiresConsent) {
+      requiredScope.push('payments:autopay_consent');
+    }
     var scope = requiredScope.concat(this.config.additionalLoginScope).join(' ');
 
     this.widgets.button = new window.OffAmazonPayments.Button(this.config.button.id, this.config.sellerId, {
@@ -285,7 +293,10 @@ export default class PayWithAmazon extends Emitter {
         }
       },
       onPaymentSelect: function () {
-        self.initConsent();
+        if (self.requiresConsent) {
+          self.initConsent();
+        }
+
         self.check();
       },
       onError: this.error
