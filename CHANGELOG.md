@@ -1,5 +1,21 @@
 # Changelog
 
+## [v2.1.1](https://github.com/recurly/pay-with-amazon/tree/v2.1.1) (2022-06-08)
+
+[Full Changelog](https://github.com/recurly/pay-with-amazon/compare/v2.1.0...v2.1.1)
+
+
+**Merged Pull Requests**
+
+- Consent widget is optional [#39](https://github.com/recurly/pay-with-amazon/pull/39) ([cyberxander90](https://github.com/cyberxander90))
+- Revert "add security to github CODEOWNER file" [#33](https://github.com/recurly/pay-with-amazon/pull/33) ([eternal44](https://github.com/eternal44))
+- add security to github CODEOWNER file [#32](https://github.com/recurly/pay-with-amazon/pull/32) ([eternal44](https://github.com/eternal44))
+
+**Closed Issues**
+
+- Can't render small button [#5](https://github.com/recurly/pay-with-amazon/issues/5)
+
+
 ## [v2.1.0](https://github.com/recurly/pay-with-amazon/tree/v2.1.0) (2021-04-21)
 
 [Full Changelog](https://github.com/recurly/pay-with-amazon/compare/v2.0.1...v2.1.0)
