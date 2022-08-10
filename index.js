@@ -225,7 +225,7 @@ export default class PayWithAmazon extends Emitter {
     var self = this;
     var type = this.config.button.type;
     var color = this.config.button.color;
-    var requiredScope = ['profile', 'payments:widget', 'payments:shipping_address'];
+    var requiredScope = ['profile', 'payments:widget', 'payments:shipping_address', 'payments:billing_address'];
     if (!this.requiresConsent) {
       requiredScope.push('payments:autopay_consent');
     }
